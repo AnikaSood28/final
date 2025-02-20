@@ -1,0 +1,339 @@
+.fixed {
+  width: 100%;
+  position: fixed;
+  top: 0;
+  transition: all 0.5s;
+  z-index: 9;
+}
+
+header {
+  width: 100%;
+  background-color: #ECECEC; /* Light color (Background) */
+  color: #000000; /* Dark Color (Text) */
+
+  .header {
+    width: 100%;
+    height: 8rem;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+  }
+
+  .logo a h2 {
+    width: 25%;
+    color: #000000; /* Dark Color (Text) */
+    cursor: pointer;
+    span {
+      color: #B1A6A4; /* Accent Color */
+    }
+  }
+
+  nav {
+    width: 75%;
+    display: flex;
+    justify-content: space-between;
+    
+    ul {
+      display: flex;
+      justify-content: space-between;
+      list-style: none;
+
+      .logo-mobile {
+        display: none;
+      }
+
+      li {
+        margin: 0 5px;
+        a {
+          color: #000000; /* Dark Color (Text) */
+          transition: color 0.3s ease;
+          &:hover {
+            color: #B1A6A4; /* Accent Color */
+          }
+        }
+      }
+    }
+  }
+
+  .header-right {
+    display: flex;
+
+    .cart a {
+      display: flex;
+      color: #000000; /* Dark Color (Text) */
+      position: relative;
+      transition: color 0.3s ease;
+      &:hover {
+        color: #B1A6A4; /* Accent Color */
+      }
+      &.active {
+        color: #595F63; /* Contrast Shade */
+      }
+      p {
+        position: absolute;
+        top: -1rem;
+        right: -1rem;
+        font-weight: 500;
+      }
+    }
+
+    span {
+      margin: 0 5px;
+     
+
+      p {
+        color: #000000; /* Dark Color (Text) */
+      }
+    }
+
+    .links {
+      display: flex;
+      align-items: center;
+      
+      a {
+        margin: 0 5px;
+        color: #000000; /* Dark Color (Text) */
+        transition: color 0.3s ease;
+        &:hover {
+          color: #B1A6A4; /* Accent Color */
+        }
+        &.active {
+          color: #595F63; /* Contrast Shade */
+        }
+      }
+    }
+  }
+
+  .menu-icon {
+    cursor: pointer;
+    display: none;
+  }
+
+  @media screen and (max-width: 800px) {
+    nav {
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 50%;
+      height: 100vh;
+      background-color: #ECECEC; /* Light color (Background) */
+      padding: 1rem;
+      z-index: 999;
+      transform: translateX(-200%);
+      transition: all 0.3s;
+
+      .nav-wrapper {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 100%;
+        height: 100vh;
+        background-color: rgba(0, 0, 0, 0.5);
+        transform: translateX();
+        transition: all 0.3s;
+      }
+
+      .show-nav-wrapper {
+        transform: translateX(100%);
+      }
+
+      ul {
+        display: block;
+        .logo-mobile {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          > * {
+            cursor: pointer;
+          }
+        }
+        li {
+          padding: 5px 0;
+          border-bottom: 1px solid #595F63; /* Contrast Shade */
+          a {
+            display: block;
+            transition: color 0.3s ease;
+            &:hover {
+              color: #B1A6A4; /* Accent Color */
+            }
+          }
+        }
+      }
+
+      .header-right {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+
+        .cart {
+          border-bottom: 1px solid #595F63; /* Contrast Shade */
+          padding: 5px 0;
+          
+          a {
+            color: #000000; /* Dark Color (Text) */
+            position: relative;
+            transition: color 0.3s ease;
+            &:hover {
+              color: #B1A6A4; /* Accent Color */
+            }
+            p {
+              position: absolute;
+              top: -1rem;
+              left: 5rem;
+              font-weight: 500;
+              color: #000000; /* Dark Color (Text) */
+            }
+          }
+        }
+
+        .links {
+          display: flex;
+          flex-direction: column;
+          width: 100%;
+          
+          a {
+            display: block;
+            width: 100%;
+            margin: 0;
+            padding: 10px 0;
+            border-bottom: 1px solid #595F63; /* Contrast Shade */
+            transition: color 0.3s ease;
+            &:hover {
+              color: #B1A6A4; /* Accent Color */
+            }
+          }
+        }
+      }
+    }
+
+    .show-nav {
+      transform: translateX(0);
+    }
+    
+    .hide-nav {
+      transform: translateX(-200%);
+    }
+    
+    .menu-icon {
+      display: flex;
+      > * {
+        margin-left: 2rem;
+      }
+    }
+  }
+}
+
+.active {
+  position: relative;
+  color: #595F63; /* Contrast Shade */
+}
+
+.active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -3px;
+  width: 100%;
+  height: 2px;
+  background-color: #000000; /* Dark Color (Text) */
+}
+
+.categories {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  padding: 14px 0;
+  font-size: 16px;
+  font-weight: 500;
+  border-top: 1px solid #B1A6A4; /* Soft taupe for a subtle separator */
+  background-color: #ECECEC; /* Cool off-white background */
+
+  a {
+    text-decoration: none;
+    color: #222222; /* Deep charcoal for a luxe feel */
+    transition: all 0.3s ease-in-out;
+    padding: 6px 12px;
+    border-radius: 4px;
+
+    &:hover {
+      color: #B1A6A4; /* Soft taupe for accent on hover */
+      transform: translateY(-2px); /* Slight lift effect for interaction */
+    }
+
+    &:active {
+      color: #595F63; /* Slate gray for active state */
+    }
+  }
+}
+
+.loginText {
+  cursor: pointer;
+  color: black;
+  transition: all 0.3s ease-in-out;
+  font-size: 1.4rem;
+  
+  &:hover {
+    color: #B1A6A4;
+  }
+}
+
+.registerText {
+  cursor: pointer;
+  color: black;
+  transition: all 0.3s ease-in-out;
+  font-size: 1.4rem;
+  
+  &:hover {
+    color: #B1A6A4;
+  }
+}
+
+@media (max-width: 768px) {
+  .links {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 0;
+    
+    
+    a {
+      width: 100%;
+      transition: color 0.3s ease;
+    }
+  }
+
+  .loginText,
+  .registerText {
+    display: block;
+    width: 100%;
+    padding: 10px 0;
+    text-align: left;
+    border-bottom: 1px solid #595F63;
+    margin: 0;
+    
+    &:hover {
+      color: #B1A6A4;
+    }
+  }
+}
+
+/* Desktop styles */
+@media (min-width: 769px) {
+  .links {
+    display: flex;
+    flex-direction: row;
+    
+    gap: 20px;
+  }
+
+  .loginText,
+  .registerText {
+    border: none;
+    padding: 0;
+  }
+}

@@ -1,0 +1,111 @@
+/* ParallaxSection.module.css */
+.parallax-container {
+    position: relative;
+    width: 100%;
+    top:0;
+    //height: 200vh;
+    overflow-x: hidden;
+  }
+  
+  .sticky-container {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    width: 100%;
+    overflow: hidden;
+  }
+  
+  .parallax-section {
+    display: flex;
+    height: 100vh;
+    align-items: stretch;
+  }
+  
+  .image-container {
+    position: relative;
+    overflow: hidden;
+    width: 50%;
+    height: 100%;
+    background-color: #f5f5f5;
+  }
+  
+  .parallax-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    //aspect-ratio: 16/9;
+    will-change: transform;
+    transition: transform 0.1s linear;
+  }
+  
+  .content-container {
+    width: 50%;
+    height: 100%;
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f5f5f5;
+  }
+  
+  .content-wrapper {
+    padding: 2rem;
+    text-align: center;
+    will-change: transform;
+    transition: transform 0.1s linear;
+  }
+  
+  .product-title {
+    font-size: 2rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 1rem;
+  }
+  
+  .product-description {
+    font-size: 1.125rem;
+    color: #666;
+    margin-bottom: 1.5rem;
+  }
+  
+  .product-price {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #333;
+  }
+  
+  /* Animation classes */
+  .fade-in {
+    opacity: 0;
+    animation: fadeIn 0.8s ease-out forwards;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Responsive styles */
+  @media (max-width: 768px) {
+    .parallax-section {
+      flex-direction: column;
+    }
+  
+    .image-container,
+    .content-container {
+      width: 100%;
+      height: 50vh;
+    }
+  }
+  
+  /* Smooth scrolling for the entire page */
+  html {
+    scroll-behavior: smooth;
+  }
