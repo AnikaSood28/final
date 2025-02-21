@@ -1,73 +1,52 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useEffect, useRef, useCallback } from "react";
 import { useParams } from "react-router-dom";
-import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchProductsByCollection } from "../../redux/features/products/productSlice";
 import styles from "./Collections.module.scss";
 
-const BACKEND_URL = "http://localhost:5000";
-
 const Collections = () => {
-  const [products, setProducts] = useState([]);
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
+  const dispatch = useDispatch();
   const { source, gender } = useParams();
+  const { filteredItems: products, status, error, page, hasMore } = useSelector(
+    (state) => state.products
+  );
 
   useEffect(() => {
-    setProducts([]);
-    setPage(1);
-    setHasMore(true);
-    fetchProducts(1);
-  }, [source, gender]);
-
-  const fetchProducts = async (pageNum) => {
-    if (!hasMore || isLoading) return;
-
-    setIsLoading(true);
-    try {
-      let url = `${BACKEND_URL}/api/products?page=${pageNum}&limit=10`;
-      if (source && gender) {
-        url = `${BACKEND_URL}/api/products/source/gender/${source}/${gender}?page=${pageNum}&limit=10`;
-      } else if (source) {
-        url = `${BACKEND_URL}/api/products/source/${source}?page=${pageNum}&limit=10`;
-      } else if (gender) {
-        url = `${BACKEND_URL}/api/products/gender/${gender}?page=${pageNum}&limit=10`;
-      }
-
-      const { data } = await axios.get(url);
-      setProducts((prev) => [...prev, ...data.products]);
-      setHasMore(data.hasMore);
-      setPage(pageNum + 1);
-    } catch (err) {
-      console.error("Error fetching products:", err);
-      setHasMore(false);
-    }
-    setIsLoading(false);
-  };
+    dispatch(fetchProductsByCollection({ source, gender, page }));
+  }, [dispatch, source, gender]);
 
   const observer = useRef();
   const lastProductRef = useCallback(
     (node) => {
-      if (isLoading) return;
+      if (status === "loading" || !hasMore) return;
       if (observer.current) observer.current.disconnect();
 
       observer.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && hasMore) {
-          fetchProducts(page);
+        if (entries[0].isIntersecting) {
+          dispatch(fetchProductsByCollection({ source, gender, page }));
         }
       });
 
       if (node) observer.current.observe(node);
     },
-    [isLoading, hasMore, page]
+    [status, dispatch, source, gender, page, hasMore]
   );
 
   const formatPrice = (price) => {
     if (!price) return "N/A";
-    if (typeof price === "number") {
-      return `Rs ${price.toLocaleString()}`;
+  
+    // Check if price already includes "Rs" to avoid duplicate formatting
+    if (typeof price === "string" && price.includes("Rs")) {
+      return price; // Return as is to avoid Rs Rs issue
     }
-    return price.toString().replace("Rs.", "Rs ").replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+  
+    // Ensure numeric format and apply formatting
+    const numericPrice = Number(price);
+    if (isNaN(numericPrice)) return "N/A"; // If not a number, return "N/A"
+  
+    return `Rs ${numericPrice.toLocaleString()}`;
   };
+  
 
   return (
     <div className={styles.collectionsPage}>
@@ -97,7 +76,8 @@ const Collections = () => {
         ))}
       </div>
 
-      {isLoading && <p>Loading more products...</p>}
+      {status === "loading" && <p>Loading more products...</p>}
+      {error && <p className={styles.error}>Error: {error}</p>}
     </div>
   );
 };

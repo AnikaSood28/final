@@ -1,32 +1,30 @@
-// features/products/productSlice.js
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import axios from "axios";
 
-// Async thunk for fetching products
-export const fetchProducts = createAsyncThunk(
-  'products/fetchProducts',
-  async (_, { rejectWithValue }) => {
-    try {
-      const response = await fetch('/api/products');
-      if (!response.ok) throw new Error('Network response was not ok');
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      return rejectWithValue(error.message);
-    }
-  }
-);
+const BACKEND_URL = "http://localhost:5000";
 
-// Async thunk for fetching products by collection
 export const fetchProductsByCollection = createAsyncThunk(
-  'products/fetchProductsByCollection',
-  async (collection, { rejectWithValue }) => {
+  "products/fetchProductsByCollection",
+  async ({ source, gender, page = 1, limit = 10 }, { rejectWithValue }) => {
     try {
-      const response = await fetch(`/api/products/collection/${collection}`);
-      if (!response.ok) throw new Error('Network response was not ok');
-      const data = await response.json();
-      return data;
+      let url = `${BACKEND_URL}/api/products?page=${page}&limit=${limit}`;
+
+      if (source && gender) {
+        url = `${BACKEND_URL}/api/products/source/gender/${source}/${gender}?page=${page}&limit=${limit}`;
+      } else if (source) {
+        url = `${BACKEND_URL}/api/products/source/${source}?page=${page}&limit=${limit}`;
+      } else if (gender) {
+        url = `${BACKEND_URL}/api/products/gender/${gender}?page=${page}&limit=${limit}`;
+      }
+
+      const response = await axios.get(url);
+      return {
+        products: response.data.products,
+        page,
+        hasMore: response.data.hasMore, // Check if more products exist
+      };
     } catch (error) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(error.response?.data?.message || error.message);
     }
   }
 );
@@ -34,85 +32,41 @@ export const fetchProductsByCollection = createAsyncThunk(
 const initialState = {
   items: [],
   filteredItems: [],
-  selectedCollection: 'All',
-  status: 'idle', // 'idle' | 'loading' | 'succeeded' | 'failed'
+  status: "idle",
   error: null,
-  sorting: {
-    field: 'price',
-    order: 'asc'
-  }
+  page: 1,  // Track current page
+  hasMore: true, // Check if there are more products
 };
 
+
 const productSlice = createSlice({
-  name: 'products',
+  name: "products",
   initialState,
   reducers: {
-    setSelectedCollection: (state, action) => {
-      state.selectedCollection = action.payload;
-      if (action.payload === 'All') {
-        state.filteredItems = state.items;
-      } else {
-        state.filteredItems = state.items.filter(
-          item => item.collection === action.payload
-        );
-      }
+    resetProducts: (state) => {
+      state.items = [];
+      state.filteredItems = [];
+      state.page = 1;
+      state.hasMore = true;
     },
-    sortProducts: (state, action) => {
-      const { field, order } = action.payload;
-      state.sorting = { field, order };
-      state.filteredItems = [...state.filteredItems].sort((a, b) => {
-        if (order === 'asc') {
-          return a[field] > b[field] ? 1 : -1;
-        }
-        return a[field] < b[field] ? 1 : -1;
-      });
-    },
-    searchProducts: (state, action) => {
-      const searchTerm = action.payload.toLowerCase();
-      state.filteredItems = state.items.filter(item =>
-        item.name.toLowerCase().includes(searchTerm) ||
-        item.collection.toLowerCase().includes(searchTerm)
-      );
-    }
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchProducts.pending, (state) => {
-        state.status = 'loading';
-      })
-      .addCase(fetchProducts.fulfilled, (state, action) => {
-        state.status = 'succeeded';
-        state.items = action.payload;
-        state.filteredItems = action.payload;
-      })
-      .addCase(fetchProducts.rejected, (state, action) => {
-        state.status = 'failed';
-        state.error = action.payload;
-      })
       .addCase(fetchProductsByCollection.pending, (state) => {
-        state.status = 'loading';
+        state.status = "loading";
       })
       .addCase(fetchProductsByCollection.fulfilled, (state, action) => {
-        state.status = 'succeeded';
-        state.filteredItems = action.payload;
+        state.status = "succeeded";
+        state.items = [...state.items, ...action.payload.products]; // Append products
+        state.filteredItems = [...state.filteredItems, ...action.payload.products];
+        state.page = action.payload.page + 1; // Increase page
+        state.hasMore = action.payload.hasMore; // Check if more products exist
       })
       .addCase(fetchProductsByCollection.rejected, (state, action) => {
-        state.status = 'failed';
+        state.status = "failed";
         state.error = action.payload;
       });
-  }
-});
-
-export const { setSelectedCollection, sortProducts, searchProducts } = productSlice.actions;
-export default productSlice.reducer;
-
-// Store configuration
-// store.js
-import { configureStore } from '@reduxjs/toolkit';
-import productReducer from './features/products/productSlice';
-
-export const store = configureStore({
-  reducer: {
-    products: productReducer,
   },
 });
+
+export default productSlice.reducer;
