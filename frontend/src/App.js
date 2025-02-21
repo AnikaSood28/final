@@ -11,6 +11,7 @@ import Footer from "./components/footer/Footer";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import Profile from "./pages/profile/Profile";
+import Collections from "./pages/collections/Collections";
 
 import { getLoginStatus } from "./redux/features/auth/authSlice";
 
@@ -38,6 +39,8 @@ const App = () => {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/collections" element={<Collections />} />
+
         </Routes>
 
         {/* Login Modal */}

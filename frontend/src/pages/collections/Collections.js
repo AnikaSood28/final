@@ -1,104 +1,95 @@
-import React, { useState, useEffect } from "react";
-import { NavLink } from "react-router-dom";
-import { Card } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import axios from 'axios';
+import styles from './Collections.module.scss';
+
+const BACKEND_URL = 'http://localhost:5000'; // Update this to match your backend URL
 
 const Collections = () => {
   const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  // Get unique collections from products
-  const getUniqueCollections = (products) => {
-    const collections = [...new Set(products.map(product => product.collection))];
-    return collections.map(collection => ({
-      name: collection,
-      // Get first product image from each collection as cover
-      coverImage: products.find(p => p.collection === collection)?.imageUrl,
-      // Calculate total products in collection
-      productCount: products.filter(p => p.collection === collection).length,
-      path: `/collections/${collection.toLowerCase()}`
-    }));
-  };
+  const { source, gender } = useParams();
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch('/api/products');
-        if (!response.ok) throw new Error('Failed to fetch products');
-        const data = await response.json();
-        setProducts(data);
-        setLoading(false);
+        let url = `${BACKEND_URL}/api/products`;
+        if (source && gender) {
+          url = `${BACKEND_URL}/api/products/source/gender/${source}/${gender}`;
+        } else if (source) {
+          url = `${BACKEND_URL}/api/products/source/${source}`;
+        } else if (gender) {
+          url = `${BACKEND_URL}/api/products/gender/${gender}`;
+        }
+
+        const response = await axios.get(url);
+        setProducts(response.data);
       } catch (err) {
-        setError(err.message);
-        setLoading(false);
+        console.error('Error fetching products:', err);
+        setError(err.response?.data?.message || 'Failed to fetch products');
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchProducts();
-  }, []);
+  }, [source, gender]);
 
-  if (loading) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-8">All Collections</h1>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[...Array(6)].map((_, i) => (
-            <Card key={i} className="overflow-hidden">
-              <Skeleton className="h-64 w-full" />
-              <div className="p-4">
-                <Skeleton className="h-6 w-1/2 mb-2" />
-                <Skeleton className="h-4 w-1/4" />
-              </div>
-            </Card>
-          ))}
-        </div>
-      </div>
-    );
+  const formatPrice = (price) => {
+    if (!price) return 'N/A'; // Handle null or undefined prices
+    if (typeof price === 'number') {
+      return `Rs ${price.toLocaleString()}`;
+    }
+    return price.toString().replace('Rs.', 'Rs ').replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+  };
+
+  if (isLoading) {
+    return <div className={styles.loading}>Loading products...</div>;
   }
 
   if (error) {
-    return (
-      <div className="container mx-auto px-4 py-8 text-center">
-        <h1 className="text-3xl font-bold mb-4">Error</h1>
-        <p className="text-red-500">{error}</p>
-      </div>
-    );
+    return <div className={styles.error}>{error}</div>;
   }
 
-  const collections = getUniqueCollections(products);
-
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">All Collections</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {collections.map((collection, index) => (
-          <NavLink 
-            key={index}
-            to={collection.path}
-            className="group block"
-          >
-            <Card className="overflow-hidden transform transition-all duration-300 hover:scale-105">
-              <div className="relative aspect-[4/3]">
+    <div className={styles.collectionsPage}>
+      <h1 className={styles.pageTitle}>
+        {source || 'All'} Collection{gender ? ` - ${gender}` : ''}
+      </h1>
+      
+      <div className={styles.productsGrid}>
+        {products.map((product) => (
+          <article className={styles.productCard} key={product._id}>
+            <div className={styles.productImage}>
+              {product.image ? (
                 <img 
-                  src={collection.coverImage || '/placeholder-image.jpg'} 
-                  alt={collection.name}
-                  className="absolute inset-0 w-full h-full object-cover"
+                  src={product.image} 
+                  alt={product.title} 
+                  loading="lazy"
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                    e.target.nextSibling.style.display = 'flex';
+                  }}
                 />
-                <div className="absolute inset-0 bg-black bg-opacity-30 group-hover:bg-opacity-20 transition-all duration-300" />
-                
-                <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
-                  <h3 className="text-2xl font-bold mb-2">{collection.name}</h3>
-                  <p className="text-sm opacity-90">{collection.productCount} Products</p>
-                  <button className="mt-4 px-6 py-2 bg-white text-black rounded-full 
-                                   transform transition-all duration-300 
-                                   opacity-0 group-hover:opacity-100 hover:bg-gray-100">
-                    Shop Now
-                  </button>
-                </div>
-              </div>
-            </Card>
-          </NavLink>
+              ) : (
+                <div className={styles.imagePlaceholder}>Image Not Available</div>
+              )}
+            </div>
+            <div className={styles.productInfo}>
+              <h2 className={styles.productTitle}>{product.title}</h2>
+              <p className={styles.productSource}>{product.source}</p>
+              <p className={styles.productPrice}>{formatPrice(product.price)}</p>
+              <a 
+                href={product.link} 
+                className={styles.productLink}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                View Product
+              </a>
+            </div>
+          </article>
         ))}
       </div>
     </div>

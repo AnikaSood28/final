@@ -1,6 +1,6 @@
 .profile-section {
   min-height: 100vh;
-  background-color: #ECECEC;
+  background-color: #f7f7f7;
 
   .container {
     max-width: 1200px;
@@ -21,7 +21,7 @@
     }
 
     .profile-photo {
-      position: absolute;
+      position: relative;
       bottom: -50px;
       left: 50%;
       transform: translateX(-50%);
