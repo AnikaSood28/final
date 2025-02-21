@@ -1,97 +1,103 @@
-import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import axios from 'axios';
-import styles from './Collections.module.scss';
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import { useParams } from "react-router-dom";
+import axios from "axios";
+import styles from "./Collections.module.scss";
 
-const BACKEND_URL = 'http://localhost:5000'; // Update this to match your backend URL
+const BACKEND_URL = "http://localhost:5000";
 
 const Collections = () => {
   const [products, setProducts] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const { source, gender } = useParams();
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        let url = `${BACKEND_URL}/api/products`;
-        if (source && gender) {
-          url = `${BACKEND_URL}/api/products/source/gender/${source}/${gender}`;
-        } else if (source) {
-          url = `${BACKEND_URL}/api/products/source/${source}`;
-        } else if (gender) {
-          url = `${BACKEND_URL}/api/products/gender/${gender}`;
-        }
-
-        const response = await axios.get(url);
-        setProducts(response.data);
-      } catch (err) {
-        console.error('Error fetching products:', err);
-        setError(err.response?.data?.message || 'Failed to fetch products');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchProducts();
+    setProducts([]);
+    setPage(1);
+    setHasMore(true);
+    fetchProducts(1);
   }, [source, gender]);
 
-  const formatPrice = (price) => {
-    if (!price) return 'N/A'; // Handle null or undefined prices
-    if (typeof price === 'number') {
-      return `Rs ${price.toLocaleString()}`;
+  const fetchProducts = async (pageNum) => {
+    if (!hasMore || isLoading) return;
+
+    setIsLoading(true);
+    try {
+      let url = `${BACKEND_URL}/api/products?page=${pageNum}&limit=10`;
+      if (source && gender) {
+        url = `${BACKEND_URL}/api/products/source/gender/${source}/${gender}?page=${pageNum}&limit=10`;
+      } else if (source) {
+        url = `${BACKEND_URL}/api/products/source/${source}?page=${pageNum}&limit=10`;
+      } else if (gender) {
+        url = `${BACKEND_URL}/api/products/gender/${gender}?page=${pageNum}&limit=10`;
+      }
+
+      const { data } = await axios.get(url);
+      setProducts((prev) => [...prev, ...data.products]);
+      setHasMore(data.hasMore);
+      setPage(pageNum + 1);
+    } catch (err) {
+      console.error("Error fetching products:", err);
+      setHasMore(false);
     }
-    return price.toString().replace('Rs.', 'Rs ').replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+    setIsLoading(false);
   };
 
-  if (isLoading) {
-    return <div className={styles.loading}>Loading products...</div>;
-  }
+  const observer = useRef();
+  const lastProductRef = useCallback(
+    (node) => {
+      if (isLoading) return;
+      if (observer.current) observer.current.disconnect();
 
-  if (error) {
-    return <div className={styles.error}>{error}</div>;
-  }
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMore) {
+          fetchProducts(page);
+        }
+      });
+
+      if (node) observer.current.observe(node);
+    },
+    [isLoading, hasMore, page]
+  );
+
+  const formatPrice = (price) => {
+    if (!price) return "N/A";
+    if (typeof price === "number") {
+      return `Rs ${price.toLocaleString()}`;
+    }
+    return price.toString().replace("Rs.", "Rs ").replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+  };
 
   return (
     <div className={styles.collectionsPage}>
       <h1 className={styles.pageTitle}>
-        {source || 'All'} Collection{gender ? ` - ${gender}` : ''}
+        {source || "All"} Collection{gender ? ` - ${gender}` : ""}
       </h1>
-      
+
       <div className={styles.productsGrid}>
-        {products.map((product) => (
-          <article className={styles.productCard} key={product._id}>
+        {products.map((product, index) => (
+          <article
+            className={styles.productCard}
+            key={product._id}
+            ref={index === products.length - 1 ? lastProductRef : null}
+          >
             <div className={styles.productImage}>
-              {product.image ? (
-                <img 
-                  src={product.image} 
-                  alt={product.title} 
-                  loading="lazy"
-                  onError={(e) => {
-                    e.target.style.display = 'none';
-                    e.target.nextSibling.style.display = 'flex';
-                  }}
-                />
-              ) : (
-                <div className={styles.imagePlaceholder}>Image Not Available</div>
-              )}
+              <img src={product.image} alt={product.title} loading="lazy" />
             </div>
             <div className={styles.productInfo}>
-              <h2 className={styles.productTitle}>{product.title}</h2>
-              <p className={styles.productSource}>{product.source}</p>
-              <p className={styles.productPrice}>{formatPrice(product.price)}</p>
-              <a 
-                href={product.link} 
-                className={styles.productLink}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              <h2>{product.title}</h2>
+              <p>{product.source}</p>
+              <p>{formatPrice(product.price)}</p>
+              <a href={product.link} target="_blank" rel="noopener noreferrer">
                 View Product
               </a>
             </div>
           </article>
         ))}
       </div>
+
+      {isLoading && <p>Loading more products...</p>}
     </div>
   );
 };
