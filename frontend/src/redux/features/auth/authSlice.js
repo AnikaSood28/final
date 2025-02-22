@@ -1,6 +1,7 @@
 import { createSlice,createAsyncThunk } from "@reduxjs/toolkit"
 import authService from "./authService"
 import { toast } from "react-toastify"
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
 
 const initialState={

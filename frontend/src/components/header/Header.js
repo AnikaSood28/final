@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from "react";
 import styles from "./Header.module.scss";
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { FaShoppingCart, FaTimes, FaUserCircle } from "react-icons/fa";
+import { FaShoppingCart, FaTimes, FaUserCircle, FaHeart } from "react-icons/fa";
 import { HiOutlineMenuAlt3 } from "react-icons/hi";
 import { useDispatch } from "react-redux";
 import { RESET_AUTH, logout } from "../../redux/features/auth/authSlice";
 import ShowOnLogin, { ShowOnLogout } from "../hiddenLink/hiddenLink";
 import { UserName } from "../../pages/profile/Profile";
 import DropdownMenu from "../Dropdown/Dropdown";
-import Login from "../../pages/auth/Login"; // Import Login Modal
-import Register from "../../pages/auth/Register"; // Import Register Modal
+import Login from "../../pages/auth/Login";
+import Register from "../../pages/auth/Register";
 
 export const logo = (
   <div className={styles.logo}>
@@ -24,8 +24,8 @@ const activeLink = ({ isActive }) => (isActive ? `${styles.active}` : "");
 const Header = () => {
   const [showMenu, setShowMenu] = useState(false);
   const [scrollPage, setScrollPage] = useState(false);
-  const [isLoginModalOpen, setLoginModalOpen] = useState(false); // Control login modal
-  const [isRegisterModalOpen, setRegisterModalOpen] = useState(false); // Control register modal
+  const [isLoginModalOpen, setLoginModalOpen] = useState(false);
+  const [isRegisterModalOpen, setRegisterModalOpen] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -34,7 +34,7 @@ const Header = () => {
       if (window.scrollY > 50) {
         setScrollPage(true);
       } else {
-        setScrollPage(false); // Fixed the bug
+        setScrollPage(false);
       }
     };
     
@@ -80,6 +80,13 @@ const Header = () => {
                 Shop
               </NavLink>
             </li>
+            <ShowOnLogin>
+              <li>
+                <NavLink to="/wishlist" className={activeLink}>
+                  Wishlist
+                </NavLink>
+              </li>
+            </ShowOnLogin>
           </ul>
 
           <div className={styles["header-right"]}>
@@ -91,7 +98,6 @@ const Header = () => {
                 </NavLink>
               </ShowOnLogin>
 
-              {/* Replace redirecting to "/login" with opening the modal */}
               <ShowOnLogout>
                 <span className={styles.loginText} onClick={() => setLoginModalOpen(true)}>
                   Login
@@ -103,6 +109,13 @@ const Header = () => {
                   Register
                 </span>
               </ShowOnLogout>
+
+              <ShowOnLogin>
+                <NavLink to="/wishlist" className={`${activeLink} ${styles.wishlist}`}>
+                  <FaHeart size={16} color="#ff7722" />
+                  Wishlist
+                </NavLink>
+              </ShowOnLogin>
 
               <ShowOnLogin>
                 <NavLink to="/order-history" className={activeLink}>
@@ -130,7 +143,6 @@ const Header = () => {
         <DropdownMenu />
       </div>
 
-      {/* Render the Login Modal when isLoginModalOpen is true */}
       {isLoginModalOpen && (
         <Login 
           isModalOpen={isLoginModalOpen} 
@@ -142,7 +154,6 @@ const Header = () => {
         />
       )}
 
-      {/* Render the Register Modal when isRegisterModalOpen is true */}
       {isRegisterModalOpen && (
         <Register 
           isModalOpen={isRegisterModalOpen} 
