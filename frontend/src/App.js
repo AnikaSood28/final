@@ -13,13 +13,16 @@ import Register from "./pages/auth/Register";
 import Profile from "./pages/profile/Profile";
 import Collections from "./pages/collections/Collections";
 import Wishlist from "./pages/wishlist/Wishlist";
-import { getLoginStatus } from "./redux/features/auth/authSlice";
 import MenCollection from "./pages/men/menspage";
+import LadiesCollection from "./pages/women/ladies";
+// ✅ Ensure this is included
+import BrandCollections from "./pages/brands/brandsCollection";
+import DropdownMenu from "./components/Dropdown/Dropdown";
 
 const AppContent = () => {
   const dispatch = useDispatch();
-  const location = useLocation(); // ✅ Now inside BrowserRouter
-  const navigate = useNavigate(); // ✅ Now inside BrowserRouter
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const [isLoginModalOpen, setLoginModalOpen] = useState(false);
   const [isRegisterModalOpen, setRegisterModalOpen] = useState(false);
@@ -30,12 +33,12 @@ const AppContent = () => {
   }, [location.pathname]);
 
   useEffect(() => {
-    console.log("Saving last visited page:", location.pathname); // ✅ Debugging log
+    console.log("Saving last visited page:", location.pathname);
     if (location.pathname !== "/") {
       localStorage.setItem("lastVisitedPage", location.pathname);
     }
   }, [location.pathname]);
-  
+
   return (
     <>
       <ToastContainer />
@@ -43,12 +46,16 @@ const AppContent = () => {
         openLogin={() => setLoginModalOpen(true)} 
         openRegister={() => setRegisterModalOpen(true)} 
       />
-      
+
+   
+
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/collections" element={<Collections />} />
+        <Route path="/collections/:source" element={<BrandCollections />} /> {/* ✅ Fix dynamic collections route */}
         <Route path="/wishlist" element={<Wishlist />} />
+        <Route path="/ladies" element={<LadiesCollection />} />
         <Route path="/men" element={<MenCollection />} />
       </Routes>
 

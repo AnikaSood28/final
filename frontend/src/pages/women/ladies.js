@@ -7,7 +7,7 @@ import Loader from "../../components/loader/Loader";
 import useWishlist from "../../hooks/useWishlist"; // ✅ Use Wishlist Hook
 import styles from "../collections/Collections.module.scss";
 
-const MenCollection = () => {
+const LadiesCollection = () => {
   const dispatch = useDispatch();
   const { filteredItems: products = [], status, error, page, hasMore } = useSelector(
     (state) => state.products
@@ -18,7 +18,7 @@ const MenCollection = () => {
   // Reset products and fetch first page on mount
   useEffect(() => {
     dispatch(resetProducts()); 
-    dispatch(fetchProductsByCollection({ gender: "men", page: 1 }));
+    dispatch(fetchProductsByCollection({ gender: "women", page: 1 }));
   }, [dispatch]);
 
   // Infinite Scroll Observer
@@ -30,7 +30,7 @@ const MenCollection = () => {
 
       observer.current = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting) {
-          dispatch(fetchProductsByCollection({ gender: "men", page })); // Fetch next page
+          dispatch(fetchProductsByCollection({ gender: "women", page })); // Fetch next page
         }
       });
 
@@ -61,7 +61,7 @@ const MenCollection = () => {
 
   return (
     <div className={styles.collectionsPage}>
-      <h1 className={styles.pageTitle}>Men's Collection</h1>
+      <h1 className={styles.pageTitle}>Ladies's Collection</h1>
       <div className={styles.productsGrid}>
         {Array.isArray(products) &&
           products.map((product, index) => (
@@ -111,9 +111,9 @@ const MenCollection = () => {
             </article>
           ))}
       </div>
-      {status === "loading" && page > 1 && <p><Loader/></p>}
+      {status === "loading" && page > 1 && <p>Loading more products...</p>}
     </div>
   );
 };
 
-export default MenCollection;
+export default LadiesCollection;

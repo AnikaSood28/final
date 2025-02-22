@@ -8,15 +8,28 @@ const menuItems = [
       title: "All Collections",
       path: "/collections",
       subcategories: [
-        { name: "Jaywalking", path: "/collections/Jaywalking" },
-        { name: "Veloce", path: "/collections/Veloce" },
-        { name: "Snitch", path: "/collections/Snitch" },
-        { name: "Zara", path: "/collections/zara" },
-        { name: "H&M", path: "/collections/hm" },
-        { name: "Huemn", path: "/collections/huemn" },
-        { name: "BurgerBae", path: "/collections/Burgerbae" },
-        { name: "Bonkers Corner", path: "/collections/Bonkerscorner" },
-        { name: "Almost Gods", path: "/collections/AlmostGods" }
+        
+          { name: "Jaywalking", path: "/collections/Jaywalking" },
+          { name: "Veloce", path: "/collections/Veloce" },
+
+          { name: "H&M", path: "/collections/hm" },
+          { name: "Huemn", path: "/collections/huemn" },
+        
+          { name: "Almost Gods", path: "/collections/AlmostGods" },
+          { name: "TurntUp", path: "/collections/TurntUp" },
+          { name: "Outcasts", path: "/collections/Outcasts" },
+          { name: "BluOrng", path: "/collections/BluOrng" },
+          { name: "SpaceBiskit", path: "/collections/SpaceBiskit" },
+          { name: "WtFlex", path: "/collections/WtFlex" },
+          { name: "Six5Six", path: "/collections/Six5Six" },
+          { name: "Drip Project", path: "/collections/DripProject" },
+          { name: "Crayyheads", path: "/collections/Crayyheads" },
+          {name:"Bomaachi",path:"/collections/Bomaachi"},
+          { name: "Blck Orchid", path: "/collections/BlckOrchid" },
+          { name: "Future Saints", path: "/collections/FutureSaints" },
+          { name: "Warping Theories", path: "/collections/WarpingTheories" }
+      
+      
       ]
     },
     {
