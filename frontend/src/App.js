@@ -12,13 +12,14 @@ import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import Profile from "./pages/profile/Profile";
 import Collections from "./pages/collections/Collections";
-
+import Wishlist from "./pages/wishlist/Wishlist";
 import { getLoginStatus } from "./redux/features/auth/authSlice";
 
 const App = () => {
   axios.defaults.withCredentials = true;
   const dispatch = useDispatch();
-  
+   // const { user, isLoggedIn } = useSelector((state) => state.auth);
+
   // State to control login and register modal visibility
   const [isLoginModalOpen, setLoginModalOpen] = useState(false);
   const [isRegisterModalOpen, setRegisterModalOpen] = useState(false);
@@ -40,8 +41,9 @@ const App = () => {
           <Route path="/" element={<Home />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/collections" element={<Collections />} />
+          <Route path="/wishlist" element={<Wishlist />} />
 
-        </Routes>
+</Routes>
 
         {/* Login Modal */}
         <Login 

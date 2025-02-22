@@ -123,16 +123,15 @@ const getLoginStatus = asyncHandler(async(req,res)=>{
    const token =req.cookies.token
 
    if(!token){
-    return res.json(false)
+    return res.json({ isLoggedIn: false });
    }
 
-   const verified= jwt.verify(token, process.env.JWT_SECRET)
-
-   if(verified){
-    res.json(true)
-   }else{
-    res.json(false)
-   }
+   try {
+    const verified = jwt.verify(token, process.env.JWT_SECRET);
+    res.json({ isLoggedIn: true });
+} catch (error) {
+    res.json({ isLoggedIn: false, message: "Invalid token" });
+}
 })
 
 const updateUser=asyncHandler(async(req,res)=>{
