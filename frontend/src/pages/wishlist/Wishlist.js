@@ -1,56 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
-import { FaHeart, FaTrash } from 'react-icons/fa';
-import axios from 'axios';
-import styles from './Wishlist.module.scss';
-import Loader from '../../components/loader/Loader';
-
-const BACKEND_URL = 'http://localhost:5000';
+import React from "react";
+import { useSelector } from "react-redux";
+import { FaHeart, FaTrash } from "react-icons/fa";
+import useWishlist from "../../hooks/useWishlist"; // ✅ Import the hook
+import styles from "./Wishlist.module.scss";
+import Loader from "../../components/loader/Loader";
 
 const Wishlist = () => {
-  const [wishlistItems, setWishlistItems] = useState([]);
-  const [loading, setLoading] = useState(true);
   const { user } = useSelector((state) => state.auth);
-
-  useEffect(() => {
-    const fetchWishlistItems = async () => {
-      if (!user?._id) return;
-      
-      try {
-        const response = await axios.get(`${BACKEND_URL}/api/wishlist/${user._id}`);
-        setWishlistItems(response.data.items || []);
-      } catch (error) {
-        console.error('Error fetching wishlist:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchWishlistItems();
-  }, [user]);
-
-  const removeFromWishlist = async (productId) => {
-    try {
-      await axios.delete(`${BACKEND_URL}/api/wishlist/remove`, {
-        data: { userId: user._id, productId }
-      });
-      setWishlistItems(prev => prev.filter(item => item._id !== productId));
-    } catch (error) {
-      console.error('Error removing from wishlist:', error);
-    }
-  };
+  const { wishlistItems, handleWishlist } = useWishlist(user); // ✅ Destructure correctly
 
   const formatPrice = (price) => {
-    if (!price) return 'N/A';
-    if (typeof price === 'number') {
-      return `Rs ${price.toLocaleString()}`;
-    }
-    return price.toString().replace('Rs.', 'Rs ').replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+    if (!price) return "N/A";
+    return typeof price === "number"
+      ? `Rs ${price.toLocaleString()}`
+      : price.toString().replace("Rs.", "Rs ").replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
   };
-
-  if (loading) {
-    return <Loader />;
-  }
 
   if (!user) {
     return (
@@ -81,7 +45,7 @@ const Wishlist = () => {
               <div className={styles.productImage}>
                 <button 
                   className={styles.removeButton}
-                  onClick={() => removeFromWishlist(product._id)}
+                  onClick={() => handleWishlist(product._id)} // ✅ Use handleWishlist properly
                   aria-label="Remove from wishlist"
                 >
                   <FaTrash />
@@ -92,10 +56,10 @@ const Wishlist = () => {
                     alt={product.title} 
                     loading="lazy"
                     onError={(e) => {
-                      e.target.style.display = 'none';
+                      e.target.style.display = "none";
                       const placeholder = e.target.parentElement.querySelector(`.${styles.imagePlaceholder}`);
                       if (placeholder) {
-                        placeholder.style.display = 'flex';
+                        placeholder.style.display = "flex";
                       }
                     }}
                   />

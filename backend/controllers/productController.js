@@ -67,12 +67,21 @@ const getProductsByGender = async (req, res) => {
     limit = parseInt(limit) || 10;
     const skip = (page - 1) * limit;
 
-    const products = await Product.find({ gender: req.params.gender })
+    // Define gender mapping
+    const genderMap = {
+      men: ["male", "Men", "unisex"],
+      women: ["female", "Ladies", "unisex"],
+      unisex: ["unisex"],
+    };
+
+    const genderFilter = genderMap[req.params.gender] || [req.params.gender]; 
+
+    const products = await Product.find({ gender: { $in: genderFilter } })
       .sort({ scrapedAt: -1 })
       .skip(skip)
       .limit(limit);
 
-    const totalProducts = await Product.countDocuments({ gender: req.params.gender });
+    const totalProducts = await Product.countDocuments({ gender: { $in: genderFilter } });
 
     res.json({
       products,
@@ -84,6 +93,7 @@ const getProductsByGender = async (req, res) => {
     res.status(500).json({ message: "Server Error", error });
   }
 };
+
 
 const getProductsBySourceAndGender = async (req, res) => {
   try {

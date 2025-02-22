@@ -80,13 +80,13 @@ const Header = () => {
                 Shop
               </NavLink>
             </li>
-            <ShowOnLogin>
+            {/* <ShowOnLogin>
               <li>
                 <NavLink to="/wishlist" className={activeLink}>
                   Wishlist
                 </NavLink>
               </li>
-            </ShowOnLogin>
+            </ShowOnLogin> */}
           </ul>
 
           <div className={styles["header-right"]}>
