@@ -8,85 +8,49 @@ import useWishlist from "../../hooks/useWishlist";
 import Loader from "../../components/loader/Loader";
 import styles from "../collections/Collections.module.scss";
 
-// ✅ Mapping UI names to database names
-const brandNameMapping = {
-  "Jaywalking": "Jaywalking",
-  "Veloce": "Veloce",
-  "H&M": "H&M",
-  "Huemn": "HUEMN",
-  "Almost Gods": "Almost Gods",
-  "TurntUp": "TURNT",
-  "Outcasts": "outcasts",
-  "BluOrng": "BluOrng",
-  "Space Biskit": "SpaceBiskit",
-  "WtFlex": "wtflex",
-  "Six5Six": "six5sixstreet",
-  "Drip Project": "Drip Project",
-  "Crayyheads": "Crayyheads",
-  "Bomaachi":"Bomaachi",
-  "Blck Orchid": "Blck Orchid",
-  "Future Saints": "Future Saints",
-  "Warping Theories": "Warping Theories"
+const categoryMapping = {
+  "tshirts": "T-shirts",
+  "jeans": "Jeans",
+  "jackets": "Jackets",
+  "shirts": "Shirts",
+  "bottoms": "Bottoms",
+  "sweatpants": "SweatPants",
+  "sweatshirts": "Sweatshirts",
+  "accessories": "Accessories",
+  "sweaters": "Sweaters",
+  "polos":"Polos",
+  "hoodies&sweatshirts": "Hoodies & Sweatshirts",
+  "denim": "Denim",
+  "hoodies":"Hoodies",
+  "jersey": "Jersey"
 };
 
-const getDatabaseName = (slug) => {
-    if (!slug) return "";
-  
-    let decodedSlug = decodeURIComponent(slug);
-    console.log("Original Slug:", slug);
-    console.log("Decoded Slug:", decodedSlug);
-  
-    // ✅ Special case for "H&M" handling
-    if (decodedSlug.toLowerCase() === "hm" || decodedSlug.toLowerCase() === "h&m") {
-      console.log("Matched H&M manually");
-      return "H&M";
-    }
-  
-    // ✅ Direct match before formatting
-    if (brandNameMapping[decodedSlug]) {
-      console.log("Matched Directly in brandNameMapping:", brandNameMapping[decodedSlug]);
-      return brandNameMapping[decodedSlug];
-    }
-  
-    // ✅ Convert camelCase or PascalCase to spaced words
-    const spacedName = decodedSlug.replace(/([a-z])([A-Z])/g, "$1 $2");
-  
-    // ✅ Capitalize first letter of each word
-    const formattedName = spacedName
-      .replace(/-/g, " ") // Convert hyphens to spaces
-      .replace(/\b\w/g, (char) => char.toUpperCase()) // Capitalize each word
-      .trim();
-  
-    console.log("Formatted Name:", formattedName);
-  
-    const finalName = brandNameMapping[formattedName] || formattedName;
-    console.log("Final Database Name:", finalName);
-  
-    return finalName;
-  };
-  
-  
-const BrandCollections = () => {
+const getCategoryName = (category) => {
+  return categoryMapping[category.toLowerCase()] || category;
+};
+
+const CategoryCollections = () => {
   const dispatch = useDispatch();
-  const { source, gender } = useParams();
-  const databaseName = getDatabaseName(source); // Convert to DB name
+  const { category } = useParams();
+  const formattedCategory = getCategoryName(category);
+  const gender = "men";
   const { filteredItems: products, status, error, page, hasMore } = useSelector(
     (state) => state.products
   );
   const { user } = useSelector((state) => state.auth);
-
-  // ✅ Use custom wishlist hook
+  
   const { wishlistItems, handleWishlist } = useWishlist(user);
 
   useEffect(() => {
-    dispatch(resetProducts()); // Reset before fetching new collection
-    dispatch(fetchProductsByCollection({ source: databaseName, gender, page: 1 }));
-  }, [dispatch, databaseName, gender]);
+    dispatch(resetProducts());
+    dispatch(fetchProductsByCollection({ gender, category: formattedCategory, page:1 }));
+
+  }, [dispatch, formattedCategory, gender]);
 
   const fetchNextPage = useCallback(() => {
     if (status === "loading" || !hasMore) return;
-    dispatch(fetchProductsByCollection({ gender, source: databaseName, page }));
-  }, [status, dispatch, page, hasMore, gender, databaseName]);
+    dispatch(fetchProductsByCollection({ gender, category: formattedCategory, page }));
+  }, [status, dispatch, page, hasMore, gender, formattedCategory]);
 
   const observer = useRef();
   const lastProductRef = useCallback((node) => {
@@ -114,17 +78,13 @@ const BrandCollections = () => {
   }
 
   if (error) {
-    return (
-      <div className={styles.error}>
-        {typeof error === "object" ? error.message || "An error occurred" : error}
-      </div>
-    );
+    return <div className={styles.error}>{error.message || "An error occurred"}</div>;
   }
 
   return (
     <div className={styles.collectionsPage}>
       <h1 className={styles.pageTitle}>
-        {databaseName || "All"} Collection{gender ? ` - ${gender}` : ""}
+        {formattedCategory || "All"} Collection - {gender}
       </h1>
 
       <div className={styles.productsGrid}>
@@ -138,18 +98,18 @@ const BrandCollections = () => {
               <div className={styles.productImage}>
                 {product.image ? (
                   <>
-                    <img
-                      src={product.image}
-                      alt={product.title || "Product"}
-                      loading="lazy"
-                      onError={(e) => {
-                        e.target.style.display = "none";
-                        const placeholder = e.target.parentElement.querySelector(`.${styles.imagePlaceholder}`);
-                        if (placeholder) {
-                          placeholder.style.display = "flex";
-                        }
-                      }}
-                    />
+                 <img 
+  src={product.image}
+  srcSet={`
+    ${product.image}?w=300 300w,
+    ${product.image}?w=600 600w,
+    ${product.image}?w=1200 1200w
+  `}
+  sizes="(max-width: 600px) 300px, (max-width: 1200px) 600px, 1200px"
+  alt={product.title || "Product"}
+  loading="lazy"
+/>
+
                     <div className={styles.imagePlaceholder} style={{ display: "none" }}>
                       Image Not Available
                     </div>
@@ -158,7 +118,6 @@ const BrandCollections = () => {
                   <div className={styles.imagePlaceholder}>Image Not Available</div>
                 )}
 
-                {/* ✅ Wishlist Button Using Hook */}
                 <button
                   className={styles.wishlistButton}
                   onClick={() => handleWishlist(product._id)}
@@ -187,6 +146,7 @@ const BrandCollections = () => {
   )}
 </p>
 
+
                 <div className={styles.productActions}>
                   <a href={product.link} className={styles.productLink} target="_blank" rel="noopener noreferrer">
                     View Product
@@ -198,13 +158,9 @@ const BrandCollections = () => {
       </div>
 
       {status === "loading" && page > 1 && <p>Loading more products...</p>}
-      {error && (
-        <p className={styles.error}>
-          {typeof error === "object" ? error.message || "An error occurred" : error}
-        </p>
-      )}
+      {error && <p className={styles.error}>{error.message || "An error occurred"}</p>}
     </div>
   );
 };
 
-export default BrandCollections;
+export default CategoryCollections;

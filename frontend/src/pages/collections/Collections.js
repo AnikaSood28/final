@@ -116,8 +116,17 @@ const Collections = () => {
               </div>
               <div className={styles.productInfo}>
                 <h2 className={styles.productTitle}>{product.title || "Untitled Product"}</h2>
-                <p className={styles.productSource}>{product.source || "Unknown Source"}</p>
-                <p className={styles.productPrice}>{formatPrice(product.price)}</p>
+                <p className={styles.productPrice}>
+  {product.salePrice && product.salePrice !== "N/A" ? (
+    <>
+      <span className={styles.originalPrice}>{formatPrice(product.price)}</span>
+      <span className={styles.salePrice}>{formatPrice(product.salePrice)}</span>
+    </>
+  ) : (
+    formatPrice(product.price)
+  )}
+</p>
+
                 <div className={styles.productActions}>
                   <a href={product.link} className={styles.productLink} target="_blank" rel="noopener noreferrer">
                     View Product
