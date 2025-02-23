@@ -1,47 +1,118 @@
 .menuContainer {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    position: relative;
-  }
+  width: 100%;
+  background-color: #f5f5f5;
+  border-bottom: 1px solid #eee;
+  position: relative;
+}
+
+.categoryRow {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 20px;
+  height: 60px;
+  gap: 32px;
+}
+
+.categoryContainer {
+  position: relative;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.category {
+  text-decoration: none;
+  color: #666;
+  font-size: 15px;
+  font-weight: 500;
+  padding: 8px 16px;
+  transition: color 0.2s ease;
   
-  .categoryRow {
-    display: flex;
-    gap: 40px; 
-    justify-content: center;
-    padding: 10px 0;
+  &:hover {
+    color: #000;
   }
-  
-  .categoryContainer {
-    position: relative;
+
+  &.active {
+    background-color: white;
+    color: #000;
+    border-radius: 4px;
   }
-  
-  .category {
-    text-decoration: none;
-    color: #222;
+}
+
+.dropdownContent {
+  position: absolute; // Changed from fixed to absolute
+  left: 50%;
+  transform: translateX(-50%); // Center the dropdown
+  top: 100%; // Position it right below the parent
+  background: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  z-index: 1000;
+  padding: 24px 0;
+  width: 100%;
+  min-width: max-content;
+}
+
+.subcategoriesGrid {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  padding: 0 20px;
+}
+
+.saleGrid {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 32px;
+  padding: 0 20px;
+}
+
+.genderSection {
+  .genderTitle {
     font-size: 16px;
-    font-weight: 500;
-    padding: 10px;
-    transition: color 0.3s ease;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: #333;
   }
+}
+
+.subcategory {
+  padding: 8px 12px;
+  text-decoration: none;
+  color: #2f9ae1;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  display: block;
   
-  .dropdownContent {
-    position: absolute;
-    top: 100%; 
-    left: 0;
-    background: white;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    border: 1px solid #ddd;
-    display: flex;
-    flex-direction: column;
-    width: 200px;
-    padding: 10px;
-    z-index: 10;
+  &:hover {
+    color: #000;
+    background-color: #f5f5f5;
+    border-radius: 4px;
   }
-  
-  .subcategory {
-    padding: 8px 10px;
-    text-decoration: none;
-    color: #595F63;
-    transition: background 0.3s;
+}
+
+// Make the All Collections grid show more items per row
+.dropdownContent .subcategoriesGrid[data-category="All Collections"] {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+// Responsive styles
+@media (max-width: 1200px) {
+  .subcategoriesGrid {
+    grid-template-columns: repeat(3, 1fr);
   }
+}
+
+@media (max-width: 768px) {
+  .subcategoriesGrid,
+  .saleGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

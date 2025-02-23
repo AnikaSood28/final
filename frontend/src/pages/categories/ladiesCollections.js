@@ -4,30 +4,57 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchProductsByCollection } from "../../redux/features/products/productThunk";
 import { resetProducts } from "../../redux/features/products/productSlice";
 import { FaHeart } from "react-icons/fa";
-import useWishlist from "../../hooks/useWishlist"; // ✅ Use the custom hook
+import useWishlist from "../../hooks/useWishlist";
 import Loader from "../../components/loader/Loader";
-import styles from "./Collections.module.scss";
+import styles from "../collections/Collections.module.scss";
 
-const Collections = () => {
+const categoryMapping = {
+  "bottoms": "Bottoms",
+  "dresses": "Dresses",
+  "swimwear": "Swimwear",
+  "accessories": "Accessories",
+  "tops": "Tops",
+  "playsuits": "Playsuits",
+  "co-ord-set": "Co-Ord Set",
+  "sweatshirts": "Sweatshirts",
+  "parachute-pants": "Parachute Pants",
+  "tshirts": "T-shirts",
+  "shirts": "Shirts",
+  "trousers": "Trousers",
+  "jeans": "Jeans",
+  "hoodies&sweatshirts": "Hoodies & Sweatshirts",
+  "shorts": "Shorts",
+  "bodysuits": "Bodysuits",
+  "denim": "Denim",
+  "skirts": "Skirts"
+};
+
+const getCategoryName = (category) => {
+  return categoryMapping[category.toLowerCase()] || category;
+};
+
+const LadiesCategoryCollections = () => {
   const dispatch = useDispatch();
-  const { source, gender } = useParams();
+  const { category } = useParams();
+  const formattedCategory = getCategoryName(category);
+  const gender = "women";
   const { filteredItems: products, status, error, page, hasMore } = useSelector(
     (state) => state.products
   );
   const { user } = useSelector((state) => state.auth);
-
-  // ✅ Use custom wishlist hook
+  
   const { wishlistItems, handleWishlist } = useWishlist(user);
 
   useEffect(() => {
-    dispatch(resetProducts()); // Reset before fetching new collection
-    dispatch(fetchProductsByCollection({ source, gender, page: 1 }));
-  }, [dispatch, source, gender]);
+    dispatch(resetProducts());
+    dispatch(fetchProductsByCollection({ gender, category: formattedCategory, page:1 }));
+
+  }, [dispatch, formattedCategory, gender]);
 
   const fetchNextPage = useCallback(() => {
     if (status === "loading" || !hasMore) return;
-    dispatch(fetchProductsByCollection({ gender, source, page }));
-  }, [status, dispatch, page, hasMore, gender, source]);
+    dispatch(fetchProductsByCollection({ gender, category: formattedCategory, page }));
+  }, [status, dispatch, page, hasMore, gender, formattedCategory]);
 
   const observer = useRef();
   const lastProductRef = useCallback((node) => {
@@ -55,17 +82,13 @@ const Collections = () => {
   }
 
   if (error) {
-    return (
-      <div className={styles.error}>
-        {typeof error === "object" ? error.message || "An error occurred" : error}
-      </div>
-    );
+    return <div className={styles.error}>{error.message || "An error occurred"}</div>;
   }
 
   return (
     <div className={styles.collectionsPage}>
       <h1 className={styles.pageTitle}>
-        {source || "All"} Collection{gender ? ` - ${gender}` : ""}
+        {formattedCategory || "All"} Collection - {gender}
       </h1>
 
       <div className={styles.productsGrid}>
@@ -79,18 +102,18 @@ const Collections = () => {
               <div className={styles.productImage}>
                 {product.image ? (
                   <>
-                    <img
-                      src={product.image}
-                      alt={product.title || "Product"}
-                      loading="lazy"
-                      onError={(e) => {
-                        e.target.style.display = "none";
-                        const placeholder = e.target.parentElement.querySelector(`.${styles.imagePlaceholder}`);
-                        if (placeholder) {
-                          placeholder.style.display = "flex";
-                        }
-                      }}
-                    />
+                 <img 
+  src={product.image}
+  srcSet={`
+    ${product.image}?w=300 300w,
+    ${product.image}?w=600 600w,
+    ${product.image}?w=1200 1200w
+  `}
+  sizes="(max-width: 600px) 300px, (max-width: 1200px) 600px, 1200px"
+  alt={product.title || "Product"}
+  loading="lazy"
+/>
+
                     <div className={styles.imagePlaceholder} style={{ display: "none" }}>
                       Image Not Available
                     </div>
@@ -99,7 +122,6 @@ const Collections = () => {
                   <div className={styles.imagePlaceholder}>Image Not Available</div>
                 )}
 
-                {/* ✅ Wishlist Button Using Hook */}
                 <button
                   className={styles.wishlistButton}
                   onClick={() => handleWishlist(product._id)}
@@ -116,6 +138,7 @@ const Collections = () => {
               </div>
               <div className={styles.productInfo}>
                 <h2 className={styles.productTitle}>{product.title || "Untitled Product"}</h2>
+                <p className={styles.productSource}>{product.source || "Unknown Source"}</p>
                 <p className={styles.productPrice}>
   {product.salePrice && product.salePrice !== "N/A" ? (
     <>
@@ -138,13 +161,9 @@ const Collections = () => {
       </div>
 
       {status === "loading" && page > 1 && <p>Loading more products...</p>}
-      {error && (
-        <p className={styles.error}>
-          {typeof error === "object" ? error.message || "An error occurred" : error}
-        </p>
-      )}
+      {error && <p className={styles.error}>{error.message || "An error occurred"}</p>}
     </div>
   );
 };
 
-export default Collections;
+export default LadiesCategoryCollections;

@@ -4,13 +4,72 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchProductsByCollection } from "../../redux/features/products/productThunk";
 import { resetProducts } from "../../redux/features/products/productSlice";
 import { FaHeart } from "react-icons/fa";
-import useWishlist from "../../hooks/useWishlist"; // ✅ Use the custom hook
+import useWishlist from "../../hooks/useWishlist";
 import Loader from "../../components/loader/Loader";
-import styles from "./Collections.module.scss";
+import styles from "../collections/Collections.module.scss";
 
-const Collections = () => {
+// ✅ Mapping UI names to database names
+const brandNameMapping = {
+  "Jaywalking": "Jaywalking",
+  "Veloce": "Veloce",
+  "H&M": "H&M",
+  "Huemn": "HUEMN",
+  "Almost Gods": "Almost Gods",
+  "TurntUp": "TURNT",
+  "Outcasts": "outcasts",
+  "BluOrng": "BluOrng",
+  "Space Biskit": "SpaceBiskit",
+  "WtFlex": "wtflex",
+  "Six5Six": "six5sixstreet",
+  "Drip Project": "Drip Project",
+  "Crayyheads": "Crayyheads",
+  "Bomaachi":"Bomaachi",
+  "Blck Orchid": "Blck Orchid",
+  "Future Saints": "Future Saints",
+  "Warping Theories": "Warping Theories"
+};
+
+const getDatabaseName = (slug) => {
+    if (!slug) return "";
+  
+    let decodedSlug = decodeURIComponent(slug);
+    console.log("Original Slug:", slug);
+    console.log("Decoded Slug:", decodedSlug);
+  
+    // ✅ Special case for "H&M" handling
+    if (decodedSlug.toLowerCase() === "hm" || decodedSlug.toLowerCase() === "h&m") {
+      console.log("Matched H&M manually");
+      return "H&M";
+    }
+  
+    // ✅ Direct match before formatting
+    if (brandNameMapping[decodedSlug]) {
+      console.log("Matched Directly in brandNameMapping:", brandNameMapping[decodedSlug]);
+      return brandNameMapping[decodedSlug];
+    }
+  
+    // ✅ Convert camelCase or PascalCase to spaced words
+    const spacedName = decodedSlug.replace(/([a-z])([A-Z])/g, "$1 $2");
+  
+    // ✅ Capitalize first letter of each word
+    const formattedName = spacedName
+      .replace(/-/g, " ") // Convert hyphens to spaces
+      .replace(/\b\w/g, (char) => char.toUpperCase()) // Capitalize each word
+      .trim();
+  
+    console.log("Formatted Name:", formattedName);
+  
+    const finalName = brandNameMapping[formattedName] || formattedName;
+    console.log("Final Database Name:", finalName);
+  
+    return finalName;
+  };
+  
+  
+const BrandCollections = () => {
   const dispatch = useDispatch();
   const { source, gender } = useParams();
+  const databaseName = getDatabaseName(source); // Convert to DB name
   const { filteredItems: products, status, error, page, hasMore } = useSelector(
     (state) => state.products
   );
@@ -21,13 +80,13 @@ const Collections = () => {
 
   useEffect(() => {
     dispatch(resetProducts()); // Reset before fetching new collection
-    dispatch(fetchProductsByCollection({ source, gender, page: 1 }));
-  }, [dispatch, source, gender]);
+    dispatch(fetchProductsByCollection({ source: databaseName, gender, page: 1 }));
+  }, [dispatch, databaseName, gender]);
 
   const fetchNextPage = useCallback(() => {
     if (status === "loading" || !hasMore) return;
-    dispatch(fetchProductsByCollection({ gender, source, page }));
-  }, [status, dispatch, page, hasMore, gender, source]);
+    dispatch(fetchProductsByCollection({ gender, source: databaseName, page }));
+  }, [status, dispatch, page, hasMore, gender, databaseName]);
 
   const observer = useRef();
   const lastProductRef = useCallback((node) => {
@@ -65,7 +124,7 @@ const Collections = () => {
   return (
     <div className={styles.collectionsPage}>
       <h1 className={styles.pageTitle}>
-        {source || "All"} Collection{gender ? ` - ${gender}` : ""}
+        {databaseName || "All"} Collection{gender ? ` - ${gender}` : ""}
       </h1>
 
       <div className={styles.productsGrid}>
@@ -116,6 +175,7 @@ const Collections = () => {
               </div>
               <div className={styles.productInfo}>
                 <h2 className={styles.productTitle}>{product.title || "Untitled Product"}</h2>
+                <p className={styles.productSource}>{product.source || "Unknown Source"}</p>
                 <p className={styles.productPrice}>
   {product.salePrice && product.salePrice !== "N/A" ? (
     <>
@@ -147,4 +207,4 @@ const Collections = () => {
   );
 };
 
-export default Collections;
+export default BrandCollections;

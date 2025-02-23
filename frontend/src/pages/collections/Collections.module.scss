@@ -115,12 +115,12 @@
       margin: 0.5rem 0;
     }
 
-    .productPrice {
-      font-size: 1.25rem;
-      color: #000;
-      font-weight: 600;
-      margin: 0 0 1rem;
-    }
+    // .productPrice {
+    //   font-size: 1.25rem;
+    //   color: #000;
+    //   font-weight: 600;
+    //   margin: 0 0 1rem;
+    // }
 
     .productLink {
       display: inline-block;
@@ -184,4 +184,19 @@
     border: 1px solid #ddd;
     font-size: 1rem;
   }
+}.originalPrice {
+  font-size: 1.25rem;
+   color: #000;
+   font-weight: 600;
+  text-decoration: line-through;
+  color: gray;
+  margin-right: 8px;
+}
+
+.salePrice {
+  font-size: 1.25rem;
+  color: #000;
+  font-weight: 600;
+  color: red;
+  font-weight: bold;
 }

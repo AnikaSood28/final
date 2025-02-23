@@ -4,125 +4,165 @@ import styles from "./Dropdown.module.scss"; // Import styles
 
 const menuItems = [
   {
-    
-      title: "All Collections",
-      path: "/collections",
-      subcategories: [
-        { name: "Jaywalking", path: "/collections/Jaywalking" },
-        { name: "Veloce", path: "/collections/Veloce" },
-        { name: "Snitch", path: "/collections/Snitch" },
-        { name: "Zara", path: "/collections/zara" },
-        { name: "H&M", path: "/collections/hm" },
-        { name: "Huemn", path: "/collections/huemn" },
-        { name: "BurgerBae", path: "/collections/Burgerbae" },
-        { name: "Bonkers Corner", path: "/collections/Bonkerscorner" },
-        { name: "Almost Gods", path: "/collections/AlmostGods" }
-      ]
-    },
-    {
-    title: "Ladies",
-    path: "/ladies",
+    title: "All Collections",
+    path: "/collections",
     subcategories: [
-      { name: "New In", path: "/ladies/new" },
-      { name: "Clothing", path: "/ladies/clothing" },
-      { name: "Sport", path: "/ladies/sport" },
-      { name: "Dresses", path: "/ladies/dresses" },
-      { name: "Tops", path: "/ladies/tops" },
-      { name: "Bottoms", path: "/ladies/bottoms" },
-      { name: "Shoes", path: "/ladies/shoes" },
-      { name: "Accessories", path: "/ladies/accessories" },
-      { name: "Bags", path: "/ladies/bags" },
-      { name: "Lingerie", path: "/ladies/lingerie" },
-      { name: "Beauty", path: "/ladies/beauty" },
-      { name: "Jewelry", path: "/ladies/jewelry" },
-      { name: "Nightwear", path: "/ladies/nightwear" }
-    ]
+      { name: "Jaywalking", path: "/collections/Jaywalking" },
+      { name: "Veloce", path: "/collections/Veloce" },
+      { name: "H&M", path: "/collections/hm" },
+      { name: "Huemn", path: "/collections/huemn" },
+      { name: "Almost Gods", path: "/collections/AlmostGods" },
+      { name: "TurntUp", path: "/collections/TurntUp" },
+      { name: "Outcasts", path: "/collections/Outcasts" },
+      { name: "BluOrng", path: "/collections/BluOrng" },
+      { name: "SpaceBiskit", path: "/collections/SpaceBiskit" },
+      { name: "WtFlex", path: "/collections/WtFlex" },
+      { name: "Six5Six", path: "/collections/Six5Six" },
+      { name: "Drip Project", path: "/collections/DripProject" },
+      { name: "Crayyheads", path: "/collections/Crayyheads" },
+      { name: "Bomaachi", path: "/collections/Bomaachi" },
+      { name: "Blck Orchid", path: "/collections/BlckOrchid" },
+      { name: "Future Saints", path: "/collections/FutureSaints" },
+      { name: "Warping Theories", path: "/collections/WarpingTheories" },
+    ],
+  },
+  {
+    title: "Ladies",
+    path: "/women",
+    subcategories: [
+      { name: "Bottoms", path: "/women/bottoms" },
+      { name: "Dresses", path: "/women/dresses" },
+      { name: "Swimwear", path: "/women/swimwear" },
+      { name: "Accessories", path: "/women/accessories" },
+      { name: "Tops", path: "/women/tops" },
+      { name: "Playsuits", path: "/women/playsuits" },
+      { name: "Co-Ord Set", path: "/women/co-ord-set" },
+      { name: "Sweatshirts", path: "/women/sweatshirts" },
+      { name: "Parachute Pants", path: "/women/parachute-pants" },
+      { name: "T-shirts", path: "/women/t-shirts" },
+      { name: "Shirts", path: "/women/shirts" },
+      { name: "Trousers", path: "/women/trousers" },
+      { name: "Jeans", path: "/women/jeans" },
+      { name: "Hoodies & Sweatshirts", path: "/women/hoodies-sweatshirts" },
+      { name: "Shorts", path: "/women/shorts" },
+      { name: "Bodysuits", path: "/women/bodysuits" },
+      { name: "Denim", path: "/women/denim" },
+      { name: "Skirts", path: "/women/skirts" },
+    ],
   },
   {
     title: "Men",
     path: "/men",
     subcategories: [
-      { name: "T-Shirts", path: "/men/tshirts" },
+      { name: "T-shirts", path: "/men/tshirts" },
+      { name: "Polos", path: "/men/polos" },
       { name: "Jeans", path: "/men/jeans" },
       { name: "Jackets", path: "/men/jackets" },
       { name: "Shirts", path: "/men/shirts" },
-      { name: "Suits", path: "/men/suits" },
-      { name: "Shoes", path: "/men/shoes" },
-      { name: "Watches", path: "/men/watches" },
+      { name: "Bottoms", path: "/men/bottoms" },
+      { name: "SweatPants", path: "/men/sweatpants" },
+      { name: "Sweatshirts", path: "/men/sweatshirts" },
       { name: "Accessories", path: "/men/accessories" },
-      { name: "Sweaters", path: "/men/sweaters" },
-      { name: "Sportswear", path: "/men/sportswear" },
-      { name: "Underwear", path: "/men/underwear" },
       { name: "Hoodies", path: "/men/hoodies" },
-      { name: "Bags", path: "/men/bags" }
-    ]
-  },
-  {
-    title: "Latest",
-    path: "/latest",
-    subcategories: [
-      { name: "New Styles", path: "/latest/new" },
-      { name: "Trending", path: "/latest/trending" },
-      { name: "Streetwear", path: "/latest/streetwear" },
-      { name: "Techwear", path: "/latest/techwear" },
-      { name: "Casual Wear", path: "/latest/casual" },
-      { name: "Sneakers", path: "/latest/sneakers" },
-      { name: "Denim", path: "/latest/denim" },
-      { name: "Oversized", path: "/latest/oversized" },
-      { name: "Formal", path: "/latest/formal" },
-      { name: "Layering", path: "/latest/layering" },
-      { name: "Luxury", path: "/latest/luxury" },
-      { name: "Minimalist", path: "/latest/minimalist" }
-    ]
+      { name: "Denim", path: "/men/denim" },
+      { name: "Jersey", path: "/men/jersey" },
+    ],
   },
   {
     title: "Sale",
-    path: "/sale",
+    
     subcategories: [
-      { name: "Discounts", path: "/sale/discounts" },
-      { name: "Clearance", path: "/sale/clearance" },
-      { name: "Limited Time Deals", path: "/sale/limited" },
-      { name: "Last Chance", path: "/sale/last-chance" },
-      { name: "Under ₹500", path: "/sale/under-500" },
-      { name: "Under ₹1000", path: "/sale/under-1000" },
-      { name: "50% Off", path: "/sale/50-off" },
-      { name: "Buy 1 Get 1", path: "/sale/bogo" },
-      { name: "Seasonal Offers", path: "/sale/seasonal" },
-      { name: "Best Sellers", path: "/sale/best-sellers" },
-      { name: "Outlet", path: "/sale/outlet" },
-      { name: "Trending Sale", path: "/sale/trending" }
-    ]
-  }
+      {
+        name: "Men",
+        path: "/sale/men",
+        subcategories: [
+          { name: "T-shirts", path: "/sale/men/tshirts" },
+          { name: "Jeans", path: "/sale/men/jeans" },
+          { name: "Jackets", path: "/sale/men/jackets" },
+          { name: "Shirts", path: "/sale/men/shirts" },
+          { name: "Bottoms", path: "/sale/men/bottoms" },
+          { name: "SweatPants", path: "/sale/men/sweatpants" },
+          { name: "Sweatshirts", path: "/sale/men/sweatshirts" },
+          { name: "Accessories", path: "/sale/men/accessories" },
+          { name: "Hoodies", path: "/sale/men/hoodies" },
+          { name: "Denim", path: "/sale/men/denim" },
+          { name: "Jersey", path: "/sale/men/jersey" },
+        ],
+      },
+      {
+        name: "Women",
+        path: "/sale/women",
+        subcategories: [
+          { name: "Bottoms", path: "/sale/women/bottoms" },
+          { name: "Dresses", path: "/sale/women/dresses" },
+          { name: "Swimwear", path: "/sale/women/swimwear" },
+          { name: "Accessories", path: "/sale/women/accessories" },
+          { name: "Tops", path: "/sale/women/tops" },
+          { name: "Playsuits", path: "/sale/women/playsuits" },
+          { name: "Co-Ord Set", path: "/sale/women/co-ord-set" },
+          { name: "Sweatshirts", path: "/sale/women/sweatshirts" },
+          { name: "T-shirts", path: "/sale/women/t-shirts" },
+          { name: "Jeans", path: "/sale/women/jeans" },
+        ],
+      },
+    ],
+  },
 ];
 
 const DropdownMenu = () => {
   const [activeCategory, setActiveCategory] = useState(null);
 
+  const renderSubcategories = (subcategories, category) => {
+    // Special handling for Sale category which has nested subcategories
+    if (category === "Sale") {
+      return (
+        <div className={styles.dropdownContent}>
+          <div className={styles.saleGrid}>
+            {subcategories.map((gender, index) => (
+              <div key={index} className={styles.genderSection}>
+                <h3 className={styles.genderTitle}>{gender.name}</h3>
+                <div className={styles.subcategoriesGrid}>
+                  {gender.subcategories.map((item, idx) => (
+                    <NavLink key={idx} to={item.path} className={styles.subcategory}>
+                      {item.name}
+                    </NavLink>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    // Regular categories (All Collections, Men, Ladies)
+    return (
+      <div className={styles.dropdownContent}>
+        <div className={styles.subcategoriesGrid}>
+          {subcategories.map((subcategory, index) => (
+            <NavLink key={index} to={subcategory.path} className={styles.subcategory}>
+              {subcategory.name}
+            </NavLink>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className={styles.menuContainer} onMouseLeave={() => setActiveCategory(null)}>
-      {/* Categories displayed side by side */}
       <div className={styles.categoryRow}>
         {menuItems.map((item, index) => (
-          <div 
-            key={index} 
+          <div
+            key={index}
             className={styles.categoryContainer}
             onMouseEnter={() => setActiveCategory(item)}
           >
-            <NavLink 
-              to={item.path} 
-              className={styles.category}
-            >
+            <NavLink to={item.path} className={styles.category}>
               {item.title}
             </NavLink>
-            {activeCategory && activeCategory.title === item.title && (
-              <div className={styles.dropdownContent}>
-                {activeCategory.subcategories.map((subcategory, subIndex) => (
-                  <NavLink key={subIndex} to={subcategory.path} className={styles.subcategory}>
-                    {subcategory.name}
-                  </NavLink>
-                ))}
-              </div>
-            )}
+            {activeCategory && activeCategory.title === item.title && 
+              renderSubcategories(item.subcategories, item.title)}
           </div>
         ))}
       </div>
