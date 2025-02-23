@@ -21,6 +21,8 @@ import DropdownMenu from "./components/Dropdown/Dropdown";
 import CategoryCollections from "./pages/categories/categoryCollections";
 import LadiesCategoryCollections from "./pages/categories/ladiesCollections";
 import SalePage from "./pages/sales/salesPage";
+import SearchResultsPage from "./pages/SearchPage/SearchPage";
+
 
 const AppContent = () => {
   const dispatch = useDispatch();
@@ -63,6 +65,8 @@ const AppContent = () => {
         <Route path="/wishlist" element={<Wishlist />} />
         <Route path="/ladies" element={<LadiesCollection />} />
         <Route path="/men" element={<MenCollection />} />
+        <Route path="/search" element={<SearchResultsPage />} />
+
       </Routes>
 
       <Login 

@@ -1,7 +1,8 @@
 const express = require("express");
-const { getProducts, getProductById, getProductsBySource, getProductsByGender, getProductsBySourceAndGender, deleteProductsBySource, getProductsBySourceAndCategory, getProductsByGenderAndCategory, getProductsBySalePriceCategoryAndGender } = require("../controllers/productController");
+const { getProducts, getProductById, getProductsBySource, getProductsByGender, getProductsBySourceAndGender, deleteProductsBySource, getProductsBySourceAndCategory, getProductsByGenderAndCategory, getProductsBySalePriceCategoryAndGender, searchProducts } = require("../controllers/productController");
 
 const router = express.Router();
+router.get('/search', searchProducts);
 
 router.get("/", getProducts);
 router.get("/:id", getProductById);

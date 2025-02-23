@@ -10,6 +10,7 @@ import { UserName } from "../../pages/profile/Profile";
 import DropdownMenu from "../Dropdown/Dropdown";
 import Login from "../../pages/auth/Login";
 import Register from "../../pages/auth/Register";
+import { SearchBar } from "../search/Search";
 
 export const logo = (
   <div className={styles.logo}>
@@ -51,14 +52,14 @@ const Header = () => {
     navigate("/");
   };
 
-  const cart = (
-    <span className={styles.cart}>
-      <Link to={"/cart"}>
-        Cart <FaShoppingCart size={20} />
-        <p>0</p>
-      </Link>
-    </span>
-  );
+  // const cart = (
+  //   <span className={styles.cart}>
+  //     <Link to={"/cart"}>
+  //       Cart <FaShoppingCart size={20} />
+  //       <p>0</p>
+  //     </Link>
+  //   </span>
+  // );
 
   return (
     <header className={scrollPage ? `${styles.fixed}` : null}>
@@ -75,11 +76,11 @@ const Header = () => {
               {logo}
               <FaTimes size={22} color="#fff" onClick={hideMenu} />
             </li>
-            <li>
+            {/* <li>
               <NavLink to="/shop" className={activeLink}>
                 Shop
               </NavLink>
-            </li>
+            </li> */}
             {/* <ShowOnLogin>
               <li>
                 <NavLink to="/wishlist" className={activeLink}>
@@ -129,12 +130,13 @@ const Header = () => {
                 </Link>
               </ShowOnLogin>
             </span>
-            {cart}
+            {/* {cart} */}
           </div>
+          <SearchBar/>
         </nav>
 
         <div className={styles["menu-icon"]}>
-          {cart}
+          {/* {cart} */}
           <HiOutlineMenuAlt3 size={28} onClick={toggleMenu} />
         </div>
       </div>
