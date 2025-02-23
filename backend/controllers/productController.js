@@ -1,5 +1,11 @@
 const Product = require("../models/productModel");
 
+const genderMap = {
+  men: ["male", "Men", "unisex"],
+  women: ["female", "Ladies", "unisex"],
+  unisex: ["unisex"],
+};
+
 const getProducts = async (req, res) => {
   try {
     let { page, limit } = req.query;
@@ -28,7 +34,8 @@ const getProducts = async (req, res) => {
 const getProductById = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
-    if (!product) return res.status(404).json({ message: "Product not found" });
+    if (!product)
+      return res.status(404).json({ message: "Product not found" });
     res.json(product);
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
@@ -47,7 +54,9 @@ const getProductsBySource = async (req, res) => {
       .skip(skip)
       .limit(limit);
 
-    const totalProducts = await Product.countDocuments({ source: req.params.source });
+    const totalProducts = await Product.countDocuments({
+      source: req.params.source,
+    });
 
     res.json({
       products,
@@ -67,21 +76,16 @@ const getProductsByGender = async (req, res) => {
     limit = parseInt(limit) || 10;
     const skip = (page - 1) * limit;
 
-    // Define gender mapping
-    const genderMap = {
-      men: ["male", "Men", "unisex"],
-      women: ["female", "Ladies", "unisex"],
-      unisex: ["unisex"],
-    };
-
-    const genderFilter = genderMap[req.params.gender] || [req.params.gender]; 
+    const genderFilter = genderMap[req.params.gender] || [req.params.gender];
 
     const products = await Product.find({ gender: { $in: genderFilter } })
       .sort({ scrapedAt: -1 })
       .skip(skip)
       .limit(limit);
 
-    const totalProducts = await Product.countDocuments({ gender: { $in: genderFilter } });
+    const totalProducts = await Product.countDocuments({
+      gender: { $in: genderFilter },
+    });
 
     res.json({
       products,
@@ -94,8 +98,73 @@ const getProductsByGender = async (req, res) => {
   }
 };
 
-
 const getProductsBySourceAndGender = async (req, res) => {
+  try {
+    let { page, limit } = req.query;
+    page = parseInt(page) || 1;
+    limit = parseInt(limit) || 10;
+    const skip = (page - 1) * limit;
+
+    const genderFilter = genderMap[req.params.gender] || [req.params.gender];
+
+    const products = await Product.find({
+      source: req.params.source,
+      gender: { $in: genderFilter },
+    })
+      .sort({ scrapedAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    const totalProducts = await Product.countDocuments({
+      source: req.params.source,
+      gender: { $in: genderFilter },
+    });
+
+    res.json({
+      products,
+      currentPage: page,
+      totalPages: Math.ceil(totalProducts / limit),
+      hasMore: skip + limit < totalProducts,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server Error", error });
+  }
+};
+
+const getProductsByGenderAndCategory = async (req, res) => {
+  try {
+    let { page, limit } = req.query;
+    page = parseInt(page) || 1;
+    limit = parseInt(limit) || 10;
+    const skip = (page - 1) * limit;
+
+    const genderFilter = genderMap[req.params.gender] || [req.params.gender];
+
+    const products = await Product.find({
+      gender: { $in: genderFilter },
+      category: req.params.category,
+    })
+      .sort({ scrapedAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    const totalProducts = await Product.countDocuments({
+      gender: { $in: genderFilter },
+      category: req.params.category,
+    });
+
+    res.json({
+      products,
+      currentPage: page,
+      totalPages: Math.ceil(totalProducts / limit),
+      hasMore: skip + limit < totalProducts,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server Error", error });
+  }
+};
+
+const getProductsBySourceAndCategory = async (req, res) => {
   try {
     let { page, limit } = req.query;
     page = parseInt(page) || 1;
@@ -104,7 +173,7 @@ const getProductsBySourceAndGender = async (req, res) => {
 
     const products = await Product.find({
       source: req.params.source,
-      gender: req.params.gender,
+      category: req.params.category,
     })
       .sort({ scrapedAt: -1 })
       .skip(skip)
@@ -112,7 +181,7 @@ const getProductsBySourceAndGender = async (req, res) => {
 
     const totalProducts = await Product.countDocuments({
       source: req.params.source,
-      gender: req.params.gender,
+      category: req.params.category,
     });
 
     res.json({
@@ -129,9 +198,51 @@ const getProductsBySourceAndGender = async (req, res) => {
 const deleteProductsBySource = async (req, res) => {
   try {
     const result = await Product.deleteMany({ source: req.params.source });
-    res.json({ message: "✅ Products deleted successfully", deletedCount: result.deletedCount });
+    res.json({
+      message: "✅ Products deleted successfully",
+      deletedCount: result.deletedCount,
+    });
   } catch (error) {
     res.status(500).json({ message: "❌ Server Error", error });
+  }
+};
+
+// ✅ New Function: Get Products by Sale Price, Category, and Gender
+// Conditions:
+// 1. salePrice must not be null
+// 2. salePrice must not equal price (using $expr for field-to-field comparison)
+// 3. Filter by category and gender (using genderMap)
+const getProductsBySalePriceCategoryAndGender = async (req, res) => {
+  try {
+    let { page, limit } = req.query;
+    page = parseInt(page) || 1;
+    limit = parseInt(limit) || 10;
+    const skip = (page - 1) * limit;
+    
+    const genderFilter = genderMap[req.params.gender] || [req.params.gender];
+
+    const query = {
+      salePrice: { $ne: null },
+      category: req.params.category,
+      gender: { $in: genderFilter },
+      $expr: { $ne: ["$salePrice", "$price"] }
+    };
+
+    const products = await Product.find(query)
+      .sort({ scrapedAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    const totalProducts = await Product.countDocuments(query);
+
+    res.json({
+      products,
+      currentPage: page,
+      totalPages: Math.ceil(totalProducts / limit),
+      hasMore: skip + limit < totalProducts,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server Error", error });
   }
 };
 
@@ -141,5 +252,8 @@ module.exports = {
   getProductsBySource,
   getProductsByGender,
   getProductsBySourceAndGender,
+  getProductsByGenderAndCategory,
+  getProductsBySourceAndCategory,
   deleteProductsBySource,
+  getProductsBySalePriceCategoryAndGender, // New Route
 };
