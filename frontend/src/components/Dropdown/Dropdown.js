@@ -70,7 +70,7 @@ const menuItems = [
   },
   {
     title: "Sale",
-    path: "/sale",
+    
     subcategories: [
       {
         name: "Men",

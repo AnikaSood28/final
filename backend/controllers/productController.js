@@ -218,14 +218,25 @@ const getProductsBySalePriceCategoryAndGender = async (req, res) => {
     page = parseInt(page) || 1;
     limit = parseInt(limit) || 10;
     const skip = (page - 1) * limit;
-    
-    const genderFilter = genderMap[req.params.gender] || [req.params.gender];
 
+    const genderFilter = genderMap[req.params.gender] || [req.params.gender];
+    
+    // Strengthened query to properly exclude null values
     const query = {
-      salePrice: { $ne: null },
       category: req.params.category,
       gender: { $in: genderFilter },
-      $expr: { $ne: ["$salePrice", "$price"] }
+      salePrice: { 
+        $exists: true,    // Must have salePrice field
+        $type: "string",  // Must be a string type
+        $ne: "N/A"        // Cannot be "N/A"
+      },
+      $expr: { 
+        $and: [
+          { $ne: ["$salePrice", null] },  // Explicit null check
+          { $ne: ["$salePrice", ""] },    // Empty string check
+          { $lt: ["$salePrice", "$price"] }  // Price comparison
+        ]
+      }
     };
 
     const products = await Product.find(query)
@@ -245,6 +256,8 @@ const getProductsBySalePriceCategoryAndGender = async (req, res) => {
     res.status(500).json({ message: "Server Error", error });
   }
 };
+
+
 
 module.exports = {
   getProducts,
