@@ -111,7 +111,11 @@ const LadiesCollection = () => {
             </article>
           ))}
       </div>
-      {status === "loading" && page > 1 && <p>Loading more products...</p>}
+      {status === "loading" && page > 1 &&  (
+              <div className={styles.loading}>
+                <div className={styles.loadingSpinner}></div>
+              </div>
+            )}
     </div>
   );
 };

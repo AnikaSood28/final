@@ -137,7 +137,11 @@ const Collections = () => {
           ))}
       </div>
 
-      {status === "loading" && page > 1 && <p>Loading more products...</p>}
+      {status === "loading" && page > 1 && (
+        <div className={styles.loading}>
+          <div className={styles.loadingSpinner}></div>
+        </div>
+      )}
       {error && (
         <p className={styles.error}>
           {typeof error === "object" ? error.message || "An error occurred" : error}

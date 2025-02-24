@@ -21,6 +21,9 @@ import DropdownMenu from "./components/Dropdown/Dropdown";
 import CategoryCollections from "./pages/categories/categoryCollections";
 import LadiesCategoryCollections from "./pages/categories/ladiesCollections";
 import SalePage from "./pages/sales/salesPage";
+import SearchResultsPage from "./pages/SearchPage/SearchPage";
+import AboutUs from "./pages/about/AboutUs";
+import AboutUsPopup from "./pages/aboutUsPopup/AboutUsPopup";
 
 const AppContent = () => {
   const dispatch = useDispatch();
@@ -44,7 +47,9 @@ const AppContent = () => {
 
   return (
     <>
+    
       <ToastContainer />
+      <AboutUsPopup />
       <Header 
         openLogin={() => setLoginModalOpen(true)} 
         openRegister={() => setRegisterModalOpen(true)} 
@@ -63,6 +68,8 @@ const AppContent = () => {
         <Route path="/wishlist" element={<Wishlist />} />
         <Route path="/ladies" element={<LadiesCollection />} />
         <Route path="/men" element={<MenCollection />} />
+        <Route path="/search" element={<SearchResultsPage />} />
+        <Route path="/about-us" element={<AboutUs />} />
       </Routes>
 
       <Login 
