@@ -16,15 +16,16 @@
 .carousel-track {
   display: flex;
   align-items: center;
-  gap: 80px;
-  animation: scroll 20s linear infinite;
+  gap: 25px;
+  animation: scroll 25s linear infinite;
   padding: 0 40px;
+  width: max-content;
 }
 
 .carousel-item {
   flex-shrink: 0;
-  width: 48px;
-  height: 48px;
+  width: 160px;
+  height: 57px;
   object-fit: contain;
 }
 
@@ -33,6 +34,6 @@
       transform: translateX(0);
   }
   100% {
-      transform: translateX(calc(-50% - 40px));
+      transform: translateX(calc(-50% ));
   }
 }
