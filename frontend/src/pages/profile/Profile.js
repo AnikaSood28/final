@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./Profile.scss";
 import { useDispatch, useSelector } from "react-redux";
 import { getUser, updatePhoto, updateUser } from "../../redux/features/auth/authSlice";
@@ -21,6 +22,7 @@ const upload_preset = process.env.REACT_APP_UPLOAD_PRESET;
 const url = "https://api.cloudinary.com/v1_1/dpqho0ea3/image/upload";
 
 const Profile = () => {
+  const navigate = useNavigate();
   const { isLoading, user } = useSelector((state) => state.auth);
   const initialState = {
     name: user?.name || "",
@@ -44,19 +46,19 @@ const Profile = () => {
 
   // Stats data
   const stats = [
-    { icon: <AiOutlineShopping />, value: "15", label: "Orders" },
+   // { icon: <AiOutlineShopping />, value: "15", label: "Orders" },
     { icon: <AiOutlineHeart />, value: "8", label: "Wishlist Items" },
-    { icon: <AiOutlineStar />, value: "1,200", label: "Loyalty Points" },
-    { icon: <AiOutlineUser />, value: "2.5K", label: "Followers" },
+    { icon: <AiOutlineStar />, value: "0", label: "Loyalty Points" },
+    { icon: <AiOutlineUser />, value: "0", label: "Followers" },
   ];
 
   // Tabs data
   const tabs = [
-    { id: "orders", label: "My Orders" },
+   // { id: "orders", label: "My Orders" },
     { id: "wishlist", label: "Wishlist" },
     { id: "settings", label: "Settings" },
     { id: "addresses", label: "Addresses" },
-    { id: "reviews", label: "Reviews (12)" },
+    { id: "about", label: "About Us" },
   ];
 
   useEffect(() => {
@@ -275,7 +277,21 @@ const Profile = () => {
 
             <div className="profile-stats">
               {stats.map((stat, index) => (
-                <div key={index} className="stat-card">
+                <div key={index} className="stat-card"
+                   onClick={() => {
+        // Handle Wishlist Items click
+        if (stat.label === "Wishlist Items") {
+          if (!user) {
+            toast.error("Please log in to view your wishlist.");
+            return;
+          }
+          navigate("/wishlist");
+        }
+      }}
+      style={{ 
+        cursor: stat.label === "Wishlist Items" ? "pointer" : "default",
+      }}
+    >
                   <div className="stat-icon">{stat.icon}</div>
                   <div className="stat-value">{stat.value}</div>
                   <div className="stat-label">{stat.label}</div>
@@ -284,12 +300,24 @@ const Profile = () => {
             </div>
 
             <nav className="profile-tabs">
-              <ul className="tab-list">
+            <ul className="tab-list">
                 {tabs.map((tab) => (
                   <li
                     key={tab.id}
                     className={`tab-item ${activeTab === tab.id ? "active" : ""}`}
-                    onClick={() => setActiveTab(tab.id)}
+                    onClick={() => {
+                      if (tab.id === "wishlist") {
+                        if (!user) {
+                          toast.error("Please log in to view your wishlist.");
+                          return;
+                        }
+                        navigate("/wishlist"); // Redirect to wishlist
+                      }  else if (tab.id === "about") {
+                        navigate("/about-us"); // This will now work with the new route
+                      } else {
+                        setActiveTab(tab.id);
+                      }
+                    }}
                   >
                     {tab.label}
                   </li>
