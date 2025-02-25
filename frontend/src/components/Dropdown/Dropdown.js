@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { NavLink } from "react-router-dom";
+
 import styles from "./Dropdown.module.scss"; // Import styles
 
 const menuItems = [
@@ -71,6 +71,7 @@ const menuItems = [
   },
   {
     title: "Sale",
+    path:"/sale",
     subcategories: [
       {
         name: "Men",

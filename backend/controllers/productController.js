@@ -192,9 +192,9 @@ const getProductsBySourceAndCategory = async (req, res) => {
       page = parseInt(page) || 1;
       limit = parseInt(limit) || 10;
       const skip = (page - 1) * limit;
-  
+      const genderFilter = genderMap[req.params.gender] || [req.params.gender];
       const products = await Product.aggregate([
-        { $match: { source: req.params.source, gender: req.params.gender } },
+        { $match: { source: req.params.source, gender: { $in: genderFilter }, } },
         ...getPriceConversionStages(),
         { $sort: getSortQuery(sort) },
         { $skip: skip },
@@ -287,6 +287,93 @@ const getProductsBySourceAndCategory = async (req, res) => {
       });
     }
   };
+  const getProductsBySalePrice = async (req, res) => {
+    try {
+        let { page, limit, sort } = req.query;
+        page = parseInt(page) || 1;
+        limit = parseInt(limit) || 10;
+        const skip = (page - 1) * limit;
+
+        const pipeline = [
+            ...getPriceConversionStages(),
+            { 
+                $match: { 
+                    salePriceNumeric: { $ne: null },
+                    $expr: { $lt: ["$salePriceNumeric", "$regularPriceNumeric"] }
+                } 
+            },
+            { $sort: getSortQuery(sort) },
+            { $skip: skip },
+            { $limit: limit }
+        ];
+
+        const products = await Product.aggregate(pipeline);
+        const totalProducts = await Product.countDocuments({
+            salePrice: { $exists: true, $ne: "N/A" }
+        });
+
+        res.json({
+            products,
+            currentPage: page,
+            totalPages: Math.ceil(totalProducts / limit),
+            hasMore: skip + limit < totalProducts,
+        });
+    } catch (error) {
+        console.error("Price conversion error:", error);
+        res.status(500).json({ 
+            message: "Server Error", 
+            error: process.env.NODE_ENV === 'development' ? error : undefined 
+        });
+    }
+};
+
+const getProductsBySalePriceAndGender = async (req, res) => {
+    try {
+        let { page, limit, sort } = req.query;
+        page = parseInt(page) || 1;
+        limit = parseInt(limit) || 10;
+        const skip = (page - 1) * limit;
+
+        const genderFilter = genderMap[req.params.gender] || [req.params.gender];
+
+        const pipeline = [
+            { 
+                $match: { 
+                    gender: { $in: genderFilter }
+                } 
+            },
+            ...getPriceConversionStages(),
+            { 
+                $match: { 
+                    salePriceNumeric: { $ne: null },
+                    $expr: { $lt: ["$salePriceNumeric", "$regularPriceNumeric"] }
+                } 
+            },
+            { $sort: getSortQuery(sort) },
+            { $skip: skip },
+            { $limit: limit }
+        ];
+
+        const products = await Product.aggregate(pipeline);
+        const totalProducts = await Product.countDocuments({
+            gender: { $in: genderFilter },
+            salePrice: { $exists: true, $ne: "N/A" }
+        });
+
+        res.json({
+            products,
+            currentPage: page,
+            totalPages: Math.ceil(totalProducts / limit),
+            hasMore: skip + limit < totalProducts,
+        });
+    } catch (error) {
+        console.error("Price conversion error:", error);
+        res.status(500).json({ 
+            message: "Server Error", 
+            error: process.env.NODE_ENV === 'development' ? error : undefined 
+        });
+    }
+};
 
 
 module.exports = {
@@ -299,4 +386,6 @@ module.exports = {
   getProductsBySourceAndCategory,
   deleteProductsBySource,
   getProductsBySalePriceCategoryAndGender, // New Route
+  getProductsBySalePrice,
+  getProductsBySalePriceAndGender,
 };

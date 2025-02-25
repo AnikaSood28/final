@@ -1,6 +1,6 @@
-
 import React, { useEffect, useRef, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
 import { fetchProductsByCollection } from "../../redux/features/products/productThunk";
 import { resetProducts } from "../../redux/features/products/productSlice";
 import { FaHeart } from "react-icons/fa";
@@ -8,35 +8,39 @@ import useWishlist from "../../hooks/useWishlist";
 import Loader from "../../components/loader/Loader";
 import styles from "../collections/Collections.module.scss";
 
-const SalePage = () => {
+const SaleGenderPage = () => {
   const dispatch = useDispatch();
+  const { gender } = useParams(); // Extract gender from URL
   const { filteredItems: products, status, error, page, hasMore } = useSelector((state) => state.products);
   const { user } = useSelector((state) => state.auth);
   const { wishlistItems, handleWishlist } = useWishlist(user);
 
   useEffect(() => {
     dispatch(resetProducts());
-    dispatch(fetchProductsByCollection({ sale: true, page: 1 }));
-  }, [dispatch]);
+    dispatch(fetchProductsByCollection({ sale: true, gender, page: 1 })); // Pass gender filter
+  }, [dispatch, gender]);
 
   const fetchNextPage = useCallback(() => {
     if (status === "loading" || !hasMore) return;
-    dispatch(fetchProductsByCollection({ sale: true, page }));
-  }, [status, dispatch, page, hasMore]);
+    dispatch(fetchProductsByCollection({ sale: true, gender, page }));
+  }, [status, dispatch, page, hasMore, gender]);
 
   const observer = useRef();
-  const lastProductRef = useCallback((node) => {
-    if (status === "loading" || !hasMore) return;
-    if (observer.current) observer.current.disconnect();
+  const lastProductRef = useCallback(
+    (node) => {
+      if (status === "loading" || !hasMore) return;
+      if (observer.current) observer.current.disconnect();
 
-    observer.current = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting) {
-        fetchNextPage();
-      }
-    });
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting) {
+          fetchNextPage();
+        }
+      });
 
-    if (node) observer.current.observe(node);
-  }, [fetchNextPage]);
+      if (node) observer.current.observe(node);
+    },
+    [fetchNextPage]
+  );
 
   const formatPrice = (price) => {
     if (!price) return "N/A";
@@ -55,7 +59,7 @@ const SalePage = () => {
 
   return (
     <div className={styles.collectionsPage}>
-      <h1 className={styles.pageTitle}>Sale</h1>
+      <h1 className={styles.pageTitle}>{gender ? `${gender.charAt(0).toUpperCase() + gender.slice(1)}'s Sale` : "Sale"}</h1>
 
       <div className={styles.productsGrid}>
         {Array.isArray(products) &&
@@ -66,18 +70,9 @@ const SalePage = () => {
               ref={index === products.length - 1 ? lastProductRef : null}
             >
               <div className={styles.productImage}>
-                <img
-                  src={product.image}
-                  alt={product.title || "Product"}
-                  loading="lazy"
-                />
-                <button
-                  className={styles.wishlistButton}
-                  onClick={() => handleWishlist(product._id)}
-                >
-                  <FaHeart
-                    className={`${styles.heartIcon} ${wishlistItems.some((item) => item._id === product._id) ? styles.wishlisted : ""}`}
-                  />
+                <img src={product.image} alt={product.title || "Product"} loading="lazy" />
+                <button className={styles.wishlistButton} onClick={() => handleWishlist(product._id)}>
+                  <FaHeart className={`${styles.heartIcon} ${wishlistItems.some((item) => item._id === product._id) ? styles.wishlisted : ""}`} />
                 </button>
               </div>
               <div className={styles.productInfo}>
@@ -109,4 +104,4 @@ const SalePage = () => {
   );
 };
 
-export default SalePage;
+export default SaleGenderPage;

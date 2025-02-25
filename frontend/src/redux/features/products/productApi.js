@@ -12,8 +12,14 @@ export const fetchProductsApi = async ({
   let endpoint = `/api/products?page=${page}&limit=${limit}&sort=${sort}`;
 
   if (sale && gender && category) {
-    endpoint = `/api/products/sales/gender/category/${gender}/${category}?page=${page}&limit=${limit}&sort=${sort}`;
-  } else if (source && category) {
+    endpoint = `/api/products/sale/gender/category/${gender}/${category}?page=${page}&limit=${limit}&sort=${sort}`;
+  }else if(sale &gender){
+    endpoint = `/api/products/sale/gender/${gender}?page=${page}&limit=${limit}&sort=${sort}`;
+  }
+  else if(sale){
+ endpoint = `/api/products/sale?page=${page}&limit=${limit}&sort=${sort}`;
+  }
+   else if (source && category) {
     endpoint = `/api/products/source/category/${source}/${category}?page=${page}&limit=${limit}&sort=${sort}`;
   } else if (gender && category) {
     endpoint = `/api/products/gender/category/${gender}/${category}?page=${page}&limit=${limit}&sort=${sort}`;
@@ -24,6 +30,7 @@ export const fetchProductsApi = async ({
   } else if (gender) {
     endpoint = `/api/products/gender/${gender}?page=${page}&limit=${limit}&sort=${sort}`;
   }
+  
 
   const response = await axiosInstance.get(endpoint);
   return {

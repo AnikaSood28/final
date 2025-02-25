@@ -20,7 +20,9 @@ import BrandCollections from "./pages/brands/brandsCollection";
 import DropdownMenu from "./components/Dropdown/Dropdown";
 import CategoryCollections from "./pages/categories/categoryCollections";
 import LadiesCategoryCollections from "./pages/categories/ladiesCollections";
+import SaleGenderCategoryPage from "./pages/sales/salesCategory&GenderPage";
 import SalePage from "./pages/sales/salesPage";
+import SaleGenderPage from "./pages/sales/salesGender";
 
 const AppContent = () => {
   const dispatch = useDispatch();
@@ -54,12 +56,14 @@ const AppContent = () => {
 
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/sale" element={<SalePage/>} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/collections" element={<Collections />} />
         <Route path="/collections/:source" element={<BrandCollections />} /> {/* ✅ Fix dynamic collections route */}
         <Route path="/men/:category" element={<CategoryCollections />} />
         <Route path="/women/:category" element={<LadiesCategoryCollections />} />
-        <Route path="/sale/:gender/:category" element={<SalePage />} />
+        <Route path="/sale/:gender" element={<SaleGenderPage/>}/>
+        <Route path="/sale/:gender/:category" element={<SaleGenderCategoryPage />} />
         <Route path="/wishlist" element={<Wishlist />} />
         <Route path="/women" element={<LadiesCollection />} />
         <Route path="/men" element={<MenCollection />} />

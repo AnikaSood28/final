@@ -1,5 +1,5 @@
-
 import React, { useEffect, useRef, useCallback } from "react";
+import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProductsByCollection } from "../../redux/features/products/productThunk";
 import { resetProducts } from "../../redux/features/products/productSlice";
@@ -8,21 +8,67 @@ import useWishlist from "../../hooks/useWishlist";
 import Loader from "../../components/loader/Loader";
 import styles from "../collections/Collections.module.scss";
 
-const SalePage = () => {
+const categoryMappingMen = {
+  "tshirts": "T-shirts",
+  "jeans": "Jeans",
+  "jackets": "Jackets",
+  "shirts": "Shirts",
+  "bottoms": "Bottoms",
+  "sweatpants": "SweatPants",
+  "sweatshirts": "Sweatshirts",
+  "accessories": "Accessories",
+  "sweaters": "Sweaters",
+  "polos": "Polos",
+  "hoodies&sweatshirts": "Hoodies & Sweatshirts",
+  "denim": "Denim",
+  "hoodies": "Hoodies",
+  "jersey": "Jersey"
+};
+
+const categoryMappingWomen = {
+  "bottoms": "Bottoms",
+  "dresses": "Dresses",
+  "swimwear": "Swimwear",
+  "accessories": "Accessories",
+  "tops": "Tops",
+  "playsuits": "Playsuits",
+  "co-ord-set": "Co-Ord Set",
+  "sweatshirts": "Sweatshirts",
+  "parachute-pants": "Parachute Pants",
+  "tshirts": "T-shirts",
+  "shirts": "Shirts",
+  "trousers": "Trousers",
+  "jeans": "Jeans",
+  "hoodies&sweatshirts": "Hoodies & Sweatshirts",
+  "shorts": "Shorts",
+  "bodysuits": "Bodysuits",
+  "denim": "Denim",
+  "skirts": "Skirts"
+};
+
+const getCategoryName = (category, gender) => {
+  const mapping = gender === "men" ? categoryMappingMen : categoryMappingWomen;
+  return mapping[category.toLowerCase()] || category;
+};
+
+const SaleGenderCategoryPage = () => {
   const dispatch = useDispatch();
+  const { gender, category } = useParams();
+  const formattedCategory = getCategoryName(category, gender);
+
   const { filteredItems: products, status, error, page, hasMore } = useSelector((state) => state.products);
   const { user } = useSelector((state) => state.auth);
   const { wishlistItems, handleWishlist } = useWishlist(user);
 
   useEffect(() => {
     dispatch(resetProducts());
-    dispatch(fetchProductsByCollection({ sale: true, page: 1 }));
-  }, [dispatch]);
+    dispatch(fetchProductsByCollection({ gender, category: formattedCategory, sale: true, page: 1 }));
+  }, [dispatch, formattedCategory, gender]);
 
   const fetchNextPage = useCallback(() => {
     if (status === "loading" || !hasMore) return;
-    dispatch(fetchProductsByCollection({ sale: true, page }));
-  }, [status, dispatch, page, hasMore]);
+    dispatch(fetchProductsByCollection({ gender, category: formattedCategory, sale: true, page }));
+  }, [status, dispatch, page, hasMore, gender, formattedCategory]);
 
   const observer = useRef();
   const lastProductRef = useCallback((node) => {
@@ -55,7 +101,7 @@ const SalePage = () => {
 
   return (
     <div className={styles.collectionsPage}>
-      <h1 className={styles.pageTitle}>Sale</h1>
+      <h1 className={styles.pageTitle}>Sale - {formattedCategory} ({gender})</h1>
 
       <div className={styles.productsGrid}>
         {Array.isArray(products) &&
@@ -109,4 +155,4 @@ const SalePage = () => {
   );
 };
 
-export default SalePage;
+export default SaleGenderCategoryPage;
