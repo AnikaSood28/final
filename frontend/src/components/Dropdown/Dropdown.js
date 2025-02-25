@@ -48,6 +48,7 @@ const menuItems = [
       { name: "Bodysuits", path: "/women/bodysuits" },
       { name: "Denim", path: "/women/denim" },
       { name: "Skirts", path: "/women/skirts" },
+    
     ],
   },
   {
@@ -70,7 +71,6 @@ const menuItems = [
   },
   {
     title: "Sale",
-    
     subcategories: [
       {
         name: "Men",
@@ -103,6 +103,7 @@ const menuItems = [
           { name: "Sweatshirts", path: "/sale/women/sweatshirts" },
           { name: "T-shirts", path: "/sale/women/t-shirts" },
           { name: "Jeans", path: "/sale/women/jeans" },
+       
         ],
       },
     ],
@@ -112,8 +113,11 @@ const menuItems = [
 const DropdownMenu = () => {
   const [activeCategory, setActiveCategory] = useState(null);
 
+  const handleNavigation = (path) => {
+    window.location.href = path; // Force a full page reload
+  };
+
   const renderSubcategories = (subcategories, category) => {
-    // Special handling for Sale category which has nested subcategories
     if (category === "Sale") {
       return (
         <div className={styles.dropdownContent}>
@@ -123,9 +127,9 @@ const DropdownMenu = () => {
                 <h3 className={styles.genderTitle}>{gender.name}</h3>
                 <div className={styles.subcategoriesGrid}>
                   {gender.subcategories.map((item, idx) => (
-                    <NavLink key={idx} to={item.path} className={styles.subcategory}>
+                    <div key={idx} className={styles.subcategory} onClick={() => handleNavigation(item.path)}>
                       {item.name}
-                    </NavLink>
+                    </div>
                   ))}
                 </div>
               </div>
@@ -135,14 +139,13 @@ const DropdownMenu = () => {
       );
     }
 
-    // Regular categories (All Collections, Men, Ladies)
     return (
       <div className={styles.dropdownContent}>
         <div className={styles.subcategoriesGrid}>
           {subcategories.map((subcategory, index) => (
-            <NavLink key={index} to={subcategory.path} className={styles.subcategory}>
+            <div key={index} className={styles.subcategory} onClick={() => handleNavigation(subcategory.path)}>
               {subcategory.name}
-            </NavLink>
+            </div>
           ))}
         </div>
       </div>
@@ -153,16 +156,11 @@ const DropdownMenu = () => {
     <div className={styles.menuContainer} onMouseLeave={() => setActiveCategory(null)}>
       <div className={styles.categoryRow}>
         {menuItems.map((item, index) => (
-          <div
-            key={index}
-            className={styles.categoryContainer}
-            onMouseEnter={() => setActiveCategory(item)}
-          >
-            <NavLink to={item.path} className={styles.category}>
+          <div key={index} className={styles.categoryContainer} onMouseEnter={() => setActiveCategory(item)}>
+            <div className={styles.category} onClick={() => handleNavigation(item.path)}>
               {item.title}
-            </NavLink>
-            {activeCategory && activeCategory.title === item.title && 
-              renderSubcategories(item.subcategories, item.title)}
+            </div>
+            {activeCategory && activeCategory.title === item.title && renderSubcategories(item.subcategories, item.title)}
           </div>
         ))}
       </div>

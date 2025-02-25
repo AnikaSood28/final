@@ -7,25 +7,22 @@ export const fetchProductsApi = async ({
   sale = false,
   page = 1,
   limit = 10,
+  sort = "newest", // Default sort option
 }) => {
-  let endpoint = `/api/products?page=${page}&limit=${limit}`;
+  let endpoint = `/api/products?page=${page}&limit=${limit}&sort=${sort}`;
 
   if (sale && gender && category) {
-    // Use the sale-price filtering endpoint
-    endpoint = `/api/products/sales/gender/category/${gender}/${category}?page=${page}&limit=${limit}`;
+    endpoint = `/api/products/sales/gender/category/${gender}/${category}?page=${page}&limit=${limit}&sort=${sort}`;
   } else if (source && category) {
-    // Use the endpoint filtering by source and category
-    endpoint = `/api/products/source/category/${source}/${category}?page=${page}&limit=${limit}`;
+    endpoint = `/api/products/source/category/${source}/${category}?page=${page}&limit=${limit}&sort=${sort}`;
   } else if (gender && category) {
-    // Use the endpoint filtering by gender and category
-    endpoint = `/api/products/gender/category/${gender}/${category}?page=${page}&limit=${limit}`;
+    endpoint = `/api/products/gender/category/${gender}/${category}?page=${page}&limit=${limit}&sort=${sort}`;
   } else if (source && gender) {
-    // Use the endpoint filtering by source and gender
-    endpoint = `/api/products/source/gender/${source}/${gender}?page=${page}&limit=${limit}`;
+    endpoint = `/api/products/source/gender/${source}/${gender}?page=${page}&limit=${limit}&sort=${sort}`;
   } else if (source) {
-    endpoint = `/api/products/source/${source}?page=${page}&limit=${limit}`;
+    endpoint = `/api/products/source/${source}?page=${page}&limit=${limit}&sort=${sort}`;
   } else if (gender) {
-    endpoint = `/api/products/gender/${gender}?page=${page}&limit=${limit}`;
+    endpoint = `/api/products/gender/${gender}?page=${page}&limit=${limit}&sort=${sort}`;
   }
 
   const response = await axiosInstance.get(endpoint);

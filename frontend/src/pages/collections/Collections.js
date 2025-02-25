@@ -2,32 +2,30 @@ import React, { useEffect, useRef, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProductsByCollection } from "../../redux/features/products/productThunk";
-import { resetProducts } from "../../redux/features/products/productSlice";
+import { resetProducts, setSort } from "../../redux/features/products/productSlice";
 import { FaHeart } from "react-icons/fa";
-import useWishlist from "../../hooks/useWishlist"; // ✅ Use the custom hook
+import useWishlist from "../../hooks/useWishlist";
 import Loader from "../../components/loader/Loader";
 import styles from "./Collections.module.scss";
 
 const Collections = () => {
   const dispatch = useDispatch();
   const { source, gender } = useParams();
-  const { filteredItems: products, status, error, page, hasMore } = useSelector(
+  const { filteredItems: products, status, error, page, hasMore, sort } = useSelector(
     (state) => state.products
   );
   const { user } = useSelector((state) => state.auth);
-
-  // ✅ Use custom wishlist hook
   const { wishlistItems, handleWishlist } = useWishlist(user);
 
   useEffect(() => {
-    dispatch(resetProducts()); // Reset before fetching new collection
-    dispatch(fetchProductsByCollection({ source, gender, page: 1 }));
-  }, [dispatch, source, gender]);
+    dispatch(resetProducts());
+    dispatch(fetchProductsByCollection({ source, gender, page: 1, sort }));
+  }, [dispatch, source, gender, sort]);
 
   const fetchNextPage = useCallback(() => {
     if (status === "loading" || !hasMore) return;
-    dispatch(fetchProductsByCollection({ gender, source, page }));
-  }, [status, dispatch, page, hasMore, gender, source]);
+    dispatch(fetchProductsByCollection({ gender, source, page, sort }));
+  }, [status, dispatch, page, hasMore, gender, source, sort]);
 
   const observer = useRef();
   const lastProductRef = useCallback((node) => {
@@ -43,11 +41,8 @@ const Collections = () => {
     if (node) observer.current.observe(node);
   }, [fetchNextPage]);
 
-  const formatPrice = (price) => {
-    if (!price) return "N/A";
-    return typeof price === "number"
-      ? `Rs ${price.toLocaleString()}`
-      : price.toString().replace("Rs.", "Rs ").replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+  const handleSortChange = (e) => {
+    dispatch(setSort(e.target.value));
   };
 
   if (status === "loading" && page === 1) {
@@ -64,9 +59,20 @@ const Collections = () => {
 
   return (
     <div className={styles.collectionsPage}>
-      <h1 className={styles.pageTitle}>
-        {source || "All"} Collection{gender ? ` - ${gender}` : ""}
-      </h1>
+      <div className={styles.header}>
+        <h1 className={styles.pageTitle}>
+          {source || "All"} Collection{gender ? ` - ${gender}` : ""}
+        </h1>
+        
+        <div className={styles.sortContainer}>
+          <span className={styles.sortLabel}>Sort By:</span>
+          <select className={styles.sortDropdown} value={sort} onChange={handleSortChange}>
+            <option value="newest">Newest</option>
+            <option value="priceLowHigh">Price: Low to High</option>
+            <option value="priceHighLow">Price: High to Low</option>
+          </select>
+        </div>
+      </div>
 
       <div className={styles.productsGrid}>
         {Array.isArray(products) &&
@@ -99,7 +105,6 @@ const Collections = () => {
                   <div className={styles.imagePlaceholder}>Image Not Available</div>
                 )}
 
-                {/* ✅ Wishlist Button Using Hook */}
                 <button
                   className={styles.wishlistButton}
                   onClick={() => handleWishlist(product._id)}
@@ -116,16 +121,17 @@ const Collections = () => {
               </div>
               <div className={styles.productInfo}>
                 <h2 className={styles.productTitle}>{product.title || "Untitled Product"}</h2>
+                <p className={styles.productSource}>{product.source || "Unknown Source"}</p>
                 <p className={styles.productPrice}>
-  {product.salePrice && product.salePrice !== "N/A" ? (
-    <>
-      <span className={styles.originalPrice}>{formatPrice(product.price)}</span>
-      <span className={styles.salePrice}>{formatPrice(product.salePrice)}</span>
-    </>
-  ) : (
-    formatPrice(product.price)
-  )}
-</p>
+                  {product.salePrice && product.salePrice !== "N/A" ? (
+                    <>
+                      <span className={styles.originalPrice}>{product.price}</span>
+                      <span className={styles.salePrice}>{product.salePrice}</span>
+                    </>
+                  ) : (
+                    product.price
+                  )}
+                </p>
 
                 <div className={styles.productActions}>
                   <a href={product.link} className={styles.productLink} target="_blank" rel="noopener noreferrer">
@@ -138,11 +144,7 @@ const Collections = () => {
       </div>
 
       {status === "loading" && page > 1 && <p>Loading more products...</p>}
-      {error && (
-        <p className={styles.error}>
-          {typeof error === "object" ? error.message || "An error occurred" : error}
-        </p>
-      )}
+      {error && <p className={styles.error}>{error}</p>}
     </div>
   );
 };

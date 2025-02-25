@@ -61,7 +61,7 @@ const AppContent = () => {
         <Route path="/women/:category" element={<LadiesCategoryCollections />} />
         <Route path="/sale/:gender/:category" element={<SalePage />} />
         <Route path="/wishlist" element={<Wishlist />} />
-        <Route path="/ladies" element={<LadiesCollection />} />
+        <Route path="/women" element={<LadiesCollection />} />
         <Route path="/men" element={<MenCollection />} />
       </Routes>
 

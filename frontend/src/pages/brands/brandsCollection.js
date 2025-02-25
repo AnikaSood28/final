@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProductsByCollection } from "../../redux/features/products/productThunk";
-import { resetProducts } from "../../redux/features/products/productSlice";
+import { resetProducts,setSort } from "../../redux/features/products/productSlice";
 import { FaHeart } from "react-icons/fa";
 import useWishlist from "../../hooks/useWishlist";
 import Loader from "../../components/loader/Loader";
@@ -26,7 +26,7 @@ const brandNameMapping = {
   "Bomaachi":"Bomaachi",
   "Blck Orchid": "Blck Orchid",
   "Future Saints": "Future Saints",
-  "Warping Theories": "Warping Theories"
+  "Warping Theories": "WarpingTheories"
 };
 
 const getDatabaseName = (slug) => {
@@ -70,7 +70,7 @@ const BrandCollections = () => {
   const dispatch = useDispatch();
   const { source, gender } = useParams();
   const databaseName = getDatabaseName(source); // Convert to DB name
-  const { filteredItems: products, status, error, page, hasMore } = useSelector(
+  const { filteredItems: products, status, error, page, hasMore ,sort} = useSelector(
     (state) => state.products
   );
   const { user } = useSelector((state) => state.auth);
@@ -80,13 +80,13 @@ const BrandCollections = () => {
 
   useEffect(() => {
     dispatch(resetProducts()); // Reset before fetching new collection
-    dispatch(fetchProductsByCollection({ source: databaseName, gender, page: 1 }));
-  }, [dispatch, databaseName, gender]);
+    dispatch(fetchProductsByCollection({ source: databaseName, gender, page: 1 ,sort}));
+  }, [dispatch, databaseName, gender,sort]);
 
   const fetchNextPage = useCallback(() => {
     if (status === "loading" || !hasMore) return;
-    dispatch(fetchProductsByCollection({ gender, source: databaseName, page }));
-  }, [status, dispatch, page, hasMore, gender, databaseName]);
+    dispatch(fetchProductsByCollection({ gender, source: databaseName, page,sort }));
+  }, [status, dispatch, page, hasMore, gender, databaseName,sort]);
 
   const observer = useRef();
   const lastProductRef = useCallback((node) => {
@@ -102,12 +102,15 @@ const BrandCollections = () => {
     if (node) observer.current.observe(node);
   }, [fetchNextPage]);
 
-  const formatPrice = (price) => {
-    if (!price) return "N/A";
-    return typeof price === "number"
-      ? `Rs ${price.toLocaleString()}`
-      : price.toString().replace("Rs.", "Rs ").replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+  const handleSortChange = (e) => {
+    dispatch(setSort(e.target.value));
   };
+  // const formatPrice = (price) => {
+  //   if (!price) return "N/A";
+  //   return typeof price === "number"
+  //     ? `Rs ${price.toLocaleString()}`
+  //     : price.toString().replace("Rs.", "Rs ").replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+  // };
 
   if (status === "loading" && page === 1) {
     return <Loader />;
@@ -120,91 +123,89 @@ const BrandCollections = () => {
       </div>
     );
   }
-
-  return (
-    <div className={styles.collectionsPage}>
-      <h1 className={styles.pageTitle}>
-        {databaseName || "All"} Collection{gender ? ` - ${gender}` : ""}
-      </h1>
-
-      <div className={styles.productsGrid}>
-        {Array.isArray(products) &&
-          products.map((product, index) => (
-            <article
-              className={styles.productCard}
-              key={product._id}
-              ref={index === products.length - 1 ? lastProductRef : null}
-            >
-              <div className={styles.productImage}>
-                {product.image ? (
-                  <>
-                    <img
-                      src={product.image}
-                      alt={product.title || "Product"}
-                      loading="lazy"
-                      onError={(e) => {
-                        e.target.style.display = "none";
-                        const placeholder = e.target.parentElement.querySelector(`.${styles.imagePlaceholder}`);
-                        if (placeholder) {
-                          placeholder.style.display = "flex";
-                        }
-                      }}
+ return (
+      <div className={styles.collectionsPage}>
+        <div className={styles.header}>
+          <h1 className={styles.pageTitle}>
+            {databaseName || "All"}  Collection 
+          </h1>
+          
+          <div className={styles.sortContainer}>
+            <span className={styles.sortLabel}>Sort By:</span>
+            <select className={styles.sortDropdown} value={sort} onChange={handleSortChange}>
+              <option value="newest">Newest</option>
+              <option value="priceLowHigh">Price: Low to High</option>
+              <option value="priceHighLow">Price: High to Low</option>
+            </select>
+          </div>
+        </div>
+  
+        <div className={styles.productsGrid}>
+          {Array.isArray(products) &&
+            products.map((product, index) => (
+              <article className={styles.productCard} key={product._id} ref={index === products.length - 1 ? lastProductRef : null}>
+                <div className={styles.productImage}>
+                  {product.image ? (
+                    <>
+                      <img
+                        src={product.image}
+                        alt={product.title || "Product"}
+                        loading="lazy"
+                        onError={(e) => {
+                          e.target.style.display = "none";
+                          const placeholder = e.target.parentElement.querySelector(`.${styles.imagePlaceholder}`);
+                          if (placeholder) {
+                            placeholder.style.display = "flex";
+                          }
+                        }}
+                      />
+                      <div className={styles.imagePlaceholder} style={{ display: "none" }}>
+                        Image Not Available
+                      </div>
+                    </>
+                  ) : (
+                    <div className={styles.imagePlaceholder}>Image Not Available</div>
+                  )}
+  
+                  <button
+                    className={styles.wishlistButton}
+                    onClick={() => handleWishlist(product._id)}
+                    aria-label={wishlistItems.some((item) => item._id === product._id) ? "Remove from wishlist" : "Add to wishlist"}
+                  >
+                    <FaHeart
+                      className={`${styles.heartIcon} ${wishlistItems.some((item) => item._id === product._id) ? styles.wishlisted : ""}`}
                     />
-                    <div className={styles.imagePlaceholder} style={{ display: "none" }}>
-                      Image Not Available
-                    </div>
-                  </>
-                ) : (
-                  <div className={styles.imagePlaceholder}>Image Not Available</div>
-                )}
-
-                {/* ✅ Wishlist Button Using Hook */}
-                <button
-                  className={styles.wishlistButton}
-                  onClick={() => handleWishlist(product._id)}
-                  aria-label={
-                    wishlistItems.some((item) => item._id === product._id) ? "Remove from wishlist" : "Add to wishlist"
-                  }
-                >
-                  <FaHeart
-                    className={`${styles.heartIcon} ${
-                      wishlistItems.some((item) => item._id === product._id) ? styles.wishlisted : ""
-                    }`}
-                  />
-                </button>
-              </div>
-              <div className={styles.productInfo}>
-                <h2 className={styles.productTitle}>{product.title || "Untitled Product"}</h2>
-                <p className={styles.productSource}>{product.source || "Unknown Source"}</p>
-                <p className={styles.productPrice}>
-  {product.salePrice && product.salePrice !== "N/A" ? (
-    <>
-      <span className={styles.originalPrice}>{formatPrice(product.price)}</span>
-      <span className={styles.salePrice}>{formatPrice(product.salePrice)}</span>
-    </>
-  ) : (
-    formatPrice(product.price)
-  )}
-</p>
-
-                <div className={styles.productActions}>
-                  <a href={product.link} className={styles.productLink} target="_blank" rel="noopener noreferrer">
-                    View Product
-                  </a>
+                  </button>
                 </div>
-              </div>
-            </article>
-          ))}
+  
+                <div className={styles.productInfo}>
+                  <h2 className={styles.productTitle}>{product.title || "Untitled Product"}</h2>
+                  <p className={styles.productSource}>{product.source || "Unknown Source"}</p>
+                  <p className={styles.productPrice}>
+                    {product.salePrice && product.salePrice !== "N/A" ? (
+                      <>
+                        <span className={styles.originalPrice}>{product.price}</span>
+                        <span className={styles.salePrice}>{product.salePrice}</span>
+                      </>
+                    ) : (
+                     product.price
+                    )}
+                  </p>
+  
+                  <div className={styles.productActions}>
+                    <a href={product.link} className={styles.productLink} target="_blank" rel="noopener noreferrer">
+                      View Product
+                    </a>
+                  </div>
+                </div>
+              </article>
+            ))}
+        </div>
+  
+        {status === "loading" && page > 1 && <p>Loading more products...</p>}
+        {error && <p className={styles.error}>{typeof error === "object" ? error.message || "An error occurred" : error}</p>}
       </div>
-
-      {status === "loading" && page > 1 && <p>Loading more products...</p>}
-      {error && (
-        <p className={styles.error}>
-          {typeof error === "object" ? error.message || "An error occurred" : error}
-        </p>
-      )}
-    </div>
-  );
-};
+    );
+  };
 
 export default BrandCollections;

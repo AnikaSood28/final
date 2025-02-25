@@ -3,14 +3,54 @@
   max-width: 1440px;
   margin: 0 auto;
 
-  .pageTitle {
-    text-align: center;
-    font-size: 2.5rem;
+  .header {
+    position: relative;
     margin-bottom: 3rem;
+    padding: 0 1rem;
+    display: flex;
+    justify-content: center;
+  }
+
+  .pageTitle {
+    font-size: 2.5rem;
     color: #2a2a2a;
     font-weight: 300;
     text-transform: uppercase;
     letter-spacing: 2px;
+    margin: 0;
+    text-align: center;
+  }
+
+  .sortContainer {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .sortLabel {
+    font-size: 1.125rem;
+    font-weight: 500;
+    color: #444;
+  }
+
+  .sortDropdown {
+    padding: 0.75rem 1.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: white;
+    font-size: 1.125rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 220px;
+
+    &:hover, &:focus {
+      border-color: #999;
+      outline: none;
+    }
   }
 
   .productsGrid {
@@ -115,12 +155,28 @@
       margin: 0.5rem 0;
     }
 
-    // .productPrice {
-    //   font-size: 1.25rem;
-    //   color: #000;
-    //   font-weight: 600;
-    //   margin: 0 0 1rem;
-    // }
+    .productPrice {
+      font-size: 1.25rem;
+      margin: 0 0 1rem;
+    }
+
+    .originalPrice {
+      text-decoration: line-through;
+      color: gray;
+      margin-right: 8px;
+      font-weight: 400;
+    }
+
+    .salePrice {
+      color: #e53935;
+      font-weight: 600;
+    }
+
+    .productActions {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+    }
 
     .productLink {
       display: inline-block;
@@ -130,6 +186,8 @@
       text-decoration: none;
       border-radius: 4px;
       transition: background-color 0.3s ease;
+      flex: 1;
+      max-width: 200px;
 
       &:hover {
         background-color: #444;
@@ -146,57 +204,34 @@
 }
 
 // Responsive Design
+@media (max-width: 992px) {
+  .collectionsPage {
+    .header {
+      flex-direction: column;
+      gap: 2rem;
+      align-items: center;
+    }
+    
+    .sortContainer {
+      position: static;
+      transform: none;
+    }
+    
+    .pageTitle {
+      font-size: 2rem;
+    }
+  }
+}
+
 @media (max-width: 768px) {
   .collectionsPage {
     padding: 2rem 1rem;
 
-    .pageTitle {
-      font-size: 2rem;
-      margin-bottom: 2rem;
-    }
-
     .productsGrid {
-      grid-template-columns: repeat(2, 1fr); // Ensure at least 2 cards in a row
-      gap: 1rem; // Adjust gap for smaller screens
-    }
-  }
-
-  .productActions {
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-
-    .productLink {
-      flex: 1;
-      max-width: 200px;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
     }
   }
 }
 
-.filters {
-  margin: 1rem auto 2rem;
-  max-width: 1200px;
-  padding: 0 1rem;
 
-  select {
-    padding: 0.5rem;
-    border-radius: 4px;
-    border: 1px solid #ddd;
-    font-size: 1rem;
-  }
-}.originalPrice {
-  font-size: 1.25rem;
-   color: #000;
-   font-weight: 600;
-  text-decoration: line-through;
-  color: gray;
-  margin-right: 8px;
-}
-
-.salePrice {
-  font-size: 1.25rem;
-  color: #000;
-  font-weight: 600;
-  color: red;
-  font-weight: bold;
-}

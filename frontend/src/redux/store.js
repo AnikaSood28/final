@@ -17,7 +17,9 @@ const authPersistConfig = {
 const productPersistConfig = {
   key: "products",
   storage,
+  whitelist: ["sort"], // ✅ Persist sorting state
 };
+
 
 const persistedAuthReducer = persistReducer(authPersistConfig, authReducer);
 const persistedProductReducer = persistReducer(productPersistConfig, productReducer);

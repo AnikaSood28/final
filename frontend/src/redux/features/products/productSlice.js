@@ -9,6 +9,7 @@ const initialState = {
   page: 1,
   hasMore: true,
   lastFetchedParams: null,
+  sort: "newest", // ✅ Add sorting state
 };
 
 const productSlice = createSlice({
@@ -24,29 +25,31 @@ const productSlice = createSlice({
       state.error = null;
       state.status = "idle";
     },
+    setSort: (state, action) => {
+      state.sort = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
-    .addCase(fetchProductsByCollection.pending, (state) => {
-      state.status = "loading";
-      state.error = null;
-      state.page += 1;  // ✅ Increment `page` here to prevent duplicate fetches
-    })
-    .addCase(fetchProductsByCollection.fulfilled, (state, action) => {
-      state.status = "succeeded";
-      state.error = null;
-    
-      if (action.payload.page === 1) {
-        state.items = action.payload.products;
-        state.filteredItems = action.payload.products;
-      } else {
-        state.items = [...state.items, ...action.payload.products];
-        state.filteredItems = [...state.filteredItems, ...action.payload.products];
-      }
-    
-      state.hasMore = action.payload.hasMore;
-    })
-    
+      .addCase(fetchProductsByCollection.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+        state.page += 1; 
+      })
+      .addCase(fetchProductsByCollection.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.error = null;
+
+        if (action.payload.page === 1) {
+          state.items = action.payload.products;
+          state.filteredItems = action.payload.products;
+        } else {
+          state.items = [...state.items, ...action.payload.products];
+          state.filteredItems = [...state.filteredItems, ...action.payload.products];
+        }
+
+        state.hasMore = action.payload.hasMore;
+      })
       .addCase(fetchProductsByCollection.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload;
@@ -54,5 +57,5 @@ const productSlice = createSlice({
   },
 });
 
-export const { resetProducts } = productSlice.actions;
+export const { resetProducts, setSort } = productSlice.actions;
 export default productSlice.reducer;
